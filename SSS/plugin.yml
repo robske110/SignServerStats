@@ -1,0 +1,6 @@
+name: SignServerStats
+api: [1.13.0, 2.0.0]
+version: 0.9.0
+load: POSTWORLD
+main: robske_110\SSS\rootPlugin
+author: robske_110
