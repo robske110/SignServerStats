@@ -230,10 +230,16 @@ class SSSSignRefreshTask extends PluginTask{
 		foreach($this->SSS->doRefreshSigns as $signData){
 			$pos = $signData[0];
 			$ip = $signData[1];
-			$signTile = $this->server->getLevelByName($pos[3])->getTile(new Vector3($pos[0], $pos[1], $pos[2], $pos[3]));
-			if($signTile instanceof Sign){
-				$lines = $this->SSS->calcSign($ip);
-				$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
+			if($this->server->loadLevel($pos[3])){
+				$signTile = $this->server->getLevelByName($pos[3])->getTile(new Vector3($pos[0], $pos[1], $pos[2], $pos[3]));
+				if($signTile instanceof Sign){
+					$lines = $this->SSS->calcSign($ip);
+					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
+				}else{
+					$this->server->broadcastMessage("r001_TILE_IS_NOT_SIGN");
+				}
+			}else{
+				$this->server->broadcastMessage("r002_UNKNOWN_LEVEL");
 			}
 		}
 	}
