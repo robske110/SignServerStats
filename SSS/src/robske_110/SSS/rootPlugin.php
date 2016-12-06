@@ -40,9 +40,11 @@ class rootPlugin extends PluginBase{
  |_____/_____/_____/ 
 */
 class SignServerStats implements Listener{
-	public $doRefreshSigns = [];
 	public $doCheckServers = [];
 	public $debug = false;
+	public $asyncTaskIsRunning = false;
+	private $server;
+	private $doRefreshSigns = [];
 	private $asyncTaskMODTs;
 	private $asyncTaskPlayers;
 	private $asyncTaskIsOnline;
@@ -53,28 +55,27 @@ class SignServerStats implements Listener{
 		$this->server->getPluginManager()->registerEvents($this, $this->main);
 		$this->db = new Config($this->main->getDataFolder() . "SignServerStatsDB.yml", Config::YAML, array()); //TODO:betterDB
 		$this->SignServerStatsCfg = new Config($this->main->getDataFolder() . "SSSconfig.yml", Config::YAML, array());
-		if($this->SignServerStatsCfg->get("ConfigVersion") != 1){
-			$this->SignServerStatsCfg->set('SSSSignRefreshTask', 40);
-			$this->SignServerStatsCfg->set('SSSAsyncTaskCaller', 200);
-			$this->SignServerStatsCfg->set('debug', true);
-			$this->SignServerStatsCfg->set('ConfigVersion', 1);
+		if($this->SignServerStatsCfg->get("ConfigVersion") != 2){
+			$this->SignServerStatsCfg->set('SSSAsyncTaskCall', 200);
+			$this->SignServerStatsCfg->set('always-start-async-task', false);
+			$this->SignServerStatsCfg->set('debug', false);
+			$this->SignServerStatsCfg->set('ConfigVersion', 2);
 		}
 		$this->SignServerStatsCfg->save();
 		if($this->SignServerStatsCfg->get('debug')){
 			$this->debug = true;
 		}
-		$this->server->getScheduler()->scheduleRepeatingTask(new SSSSignRefreshTask($this->main, $this), $this->SignServerStatsCfg->get("SSSSignRefreshTask"));
 		$this->server->getScheduler()->scheduleRepeatingTask(new SSSAsyncTaskCaller($this->main, $this), $this->SignServerStatsCfg->get("SSSAsyncTaskCaller"));
 		$this->recalcdRSvar();
 	}
 	
 	public function asyncTaskCallBack($data){
+		if(!is_array($data)){
+			return;
+		}
 		if($this->debug){
 			#echo("AsyncTaskResponse:\n");
 			#var_dump($data);
-		}
-		if(!isset($data)){
-			return;
 		}
 		foreach($data as $serverID => $serverData){
 			$this->asyncTaskIsOnline[$serverID] = $serverData[2];
@@ -83,9 +84,44 @@ class SignServerStats implements Listener{
 				$this->asyncTaskPlayers[$serverID] = $serverData[0];
 			}
 		}
+		$this->doSignRefresh();
 	}
 	
-	public function doesSignExist(Vector3 $pos, $levelName){
+	public function isAllowedToStartAsyncTask(): bool{
+		return $this->SignServerStatsCfg->get('always-start-async-task') ? true : !$this->asyncTaskIsRunning;
+	}
+	
+	public function getOnlineServers(): array{
+		return $this->asyncTaskIsOnline;
+	}
+	
+	public function getMODTs(): array{
+		return $this->asyncMODTs;
+	}
+	
+	public function getPlayerData(): array{
+		return $this->asyncTaskPlayers;
+	}
+	
+	public function doSignRefresh(){
+		foreach($this->doRefreshSigns as $signData){
+			$pos = $signData[0];
+			$ip = $signData[1];
+			if($this->server->loadLevel($pos[3])){
+				$signTile = $this->server->getLevelByName($pos[3])->getTile(new Vector3($pos[0], $pos[1], $pos[2], $pos[3]));
+				if($signTile instanceof Sign){
+					$lines = $this->calcSign($ip);
+					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
+				}else{
+					$this->server->broadcastMessage("r001_TILE_IS_NOT_SIGN");
+				}
+			}else{
+				$this->server->broadcastMessage("r002_UNKNOWN_LEVEL");
+			}
+		}
+	}
+	
+	public function doesSignExist(Vector3 $pos, $levelName): bool{
 		$foundSign = false;
 		$deParsedPos = [$pos->x, $pos->y, $pos->z, $levelName];
 		foreach($this->doRefreshSigns as $key => $signData){
@@ -105,7 +141,7 @@ class SignServerStats implements Listener{
 		$this->db->save();
 	}
 	
-	public function removeSign(Vector3 $pos, $levelName){
+	public function removeSign(Vector3 $pos, $levelName): bool{
 		$foundSign = false;
 		$deParsedPos = [$pos->x, $pos->y, $pos->z, $levelName];
 		foreach($this->doRefreshSigns as $key => $signData){
@@ -132,7 +168,7 @@ class SignServerStats implements Listener{
 		}
 	}
 	
-	public function calcSign($ip){
+	public function calcSign($ip): array{
 		$realIP = $ip[0];
 		$port = $ip[1];
 		if(isset($this->asyncTaskIsOnline[$realIP.$port])){
@@ -170,12 +206,11 @@ class SignServerStats implements Listener{
 				if($this->removeSign($pos, $levelName)){
 					$event->getPlayer()->sendMessage("[SSS] Sign sucessfully deleted!");
 				}else{
-					$this->server->broadcastMessage("CRITICAL/r008_FAIL::removeSign [Additional Info: removeSign() has returned false]");
+					$this->server->broadcastMessage("CRITICAL/r005_FAIL::removeSign [Additional Info: removeSign() has returned false]");
 				}
 				$this->recalcdRSvar();
 			}else{
-				$event->getPlayer()->sendMessage("[Cuboss] No, you are not allowed to do that!");
-				$this->server->broadcastMessage("r007_Perm_Blocked");
+				$event->getPlayer()->sendMessage("[SSS] No, you are not allowed to do that!");
 				$event->setCancelled();
 			}
 		}
@@ -192,56 +227,29 @@ class SignServerStats implements Listener{
 				if(!empty($sign[1])){
 					if(!empty($sign[2])){
 						$pos = new Vector3($event->getBlock()->x, $event->getBlock()->y, $event->getBlock()->z);
-						$level = $event->getBlock()->getLevel()->getName();
-						$this->addSign($sign[1], $sign[2], $pos, $level);
+						$levelName = $event->getBlock()->getLevel()->getName();
+						$this->addSign($sign[1], $sign[2], $pos, $levelName);
 						$this->recalcdRSvar();
 						$event->getPlayer()->sendMessage("[SSS] The ServerStats Sign for the IP '".$sign[1]."' Port '".$sign[2]."' is set up correctly!");
 					}else{
 						$event->getPlayer()->sendMessage("[SSS] PORT_MISSING (LINE3)");
-						$this->server->broadcastMessage("r006_PORT_MISSING");
+						$this->server->broadcastMessage("r003_PORT_MISSING");
 						$event->setLine(0,"[BROKEN]");
 						return false;
 					}
 				}else{
 					$event->getPlayer()->sendMessage("[SSS] IP_MISSING (LINE2)");
-					$this->server->broadcastMessage("r005_IP_MISSING");
+					$this->server->broadcastMessage("r004_IP_MISSING");
 					$event->setLine(0,"[BROKEN]");
 					return false;
 				}
 			}else{
 				$event->getPlayer()->sendMessage("[SSS] No, you are not allowed to do that!");
-				$this->server->broadcastMessage("r004_Perm_Blocked");
 				$event->setLine(0,"[BLOCKED]");
 				return false;
 			}
 		}
 		return true;
-	}
-}
-
-class SSSSignRefreshTask extends PluginTask{
-	public function __construct(rootPlugin $main, $parent){
-		parent::__construct($main);
-		$this->server = $parent->server;
-		$this->SSS = $parent;
-	}
-	
-	public function onRun($currentTick){
-		foreach($this->SSS->doRefreshSigns as $signData){
-			$pos = $signData[0];
-			$ip = $signData[1];
-			if($this->server->loadLevel($pos[3])){
-				$signTile = $this->server->getLevelByName($pos[3])->getTile(new Vector3($pos[0], $pos[1], $pos[2], $pos[3]));
-				if($signTile instanceof Sign){
-					$lines = $this->SSS->calcSign($ip);
-					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
-				}else{
-					$this->server->broadcastMessage("r001_TILE_IS_NOT_SIGN");
-				}
-			}else{
-				$this->server->broadcastMessage("r002_UNKNOWN_LEVEL");
-			}
-		}
 	}
 }
 
@@ -253,8 +261,10 @@ class SSSAsyncTaskCaller extends PluginTask{
 	}
 	
 	public function onRun($currentTick){
-		$this->server->SSS = $this->SSS;
-		$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->SSS->doCheckServers, $this->SSS->debug));
+		if($this->SSS->isAllowedToStartAsyncTask()){
+			$this->SSS->asyncTaskIsRunning = true;
+			$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->SSS->doCheckServers, $this->SSS->debug));
+		}
 	}
 }
 
@@ -262,12 +272,12 @@ class SSSAsyncTask extends AsyncTask{
   private $serverFINALdata;
   private $doCheckServer;
   
-  public function __construct($doCheckServers, $debug){
+  public function __construct(array $doCheckServers, bool $debug){
 	  $this->doCheckServer = $doCheckServers;
 	  $this->debug = $debug;
   }
   
-  private function doQuery($ip, $port){
+  private function doQuery(int $ip, int $port): array{
   	  if($this->debug){
   	  	echo("doQuery:\n");
   	  }
@@ -360,7 +370,7 @@ class SSSAsyncTask extends AsyncTask{
   }
   
   public function onCompletion(Server $server){
-	  $server->SSS->asyncTaskCallBack($this->getResult());
+	  $server->getPluginManager()->getPlugin("SignServerStats")->getAPI()->asyncTaskCallBack($this->getResult());
   }
 }
 //Theory is when you know something, but it doesn"t work. Practice is when something works, but you don"t know why. Programmers combine theory and practice: Nothing works and they don"t know why!

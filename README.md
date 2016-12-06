@@ -18,6 +18,6 @@ The plugin will recognize that sign and fill it with colorful stats!
 
 - language system
 
-- sign style
+- sign style config
 
 - playerlist?
