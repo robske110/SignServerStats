@@ -49,7 +49,7 @@ class SignServerStats implements Listener{
 	private $asyncTaskPlayers;
 	private $asyncTaskIsOnline;
 
-	public function __construct($main){
+	public function __construct(rootPlugin $main){
 		$this->main = $main;
 		$this->server = $main->getServer();
 		$this->server->getPluginManager()->registerEvents($this, $this->main);
@@ -69,7 +69,13 @@ class SignServerStats implements Listener{
 		$this->recalcdRSvar();
 	}
 	
-	public function asyncTaskCallBack($data){
+	public function startAsyncTask($currTick){
+		$this->asyncTaskIsRunning = true;
+		$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $currTick));
+	}
+	
+	public function asyncTaskCallBack($data, $scheduleTime){
+		$this->asyncTaskIsRunning = false;
 		if(!is_array($data)){
 			return;
 		}
@@ -85,6 +91,10 @@ class SignServerStats implements Listener{
 			}
 		}
 		$this->doSignRefresh();
+		$currTick = $this->server->getTick();
+		if($currTick - $scheduleTime >= $this->SignServerStatsCfg->get('SSSAsyncTaskCall')){
+			$this->startAsyncTask($currTick);
+		}
 	}
 	
 	public function isAllowedToStartAsyncTask(): bool{
@@ -113,10 +123,10 @@ class SignServerStats implements Listener{
 					$lines = $this->calcSign($ip);
 					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
 				}else{
-					$this->server->broadcastMessage("r001_TILE_IS_NOT_SIGN");
+					$this->server->broadcast("r001_SIGN_NOT_FOUND_AT(".$pos[0]."/"$pos[1]."/".$pos[2]." in "$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
 				}
 			}else{
-				$this->server->broadcastMessage("r002_UNKNOWN_LEVEL");
+				$this->server->broadcast("r002_COULD_NOT_FIND_LEVEL_FOR_SIGN_AT(".$pos[0]."/"$pos[1]."/".$pos[2]." in "$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
 			}
 		}
 	}
@@ -200,13 +210,13 @@ class SignServerStats implements Listener{
 	public function onBreak(BlockBreakEvent $event){ 
 		$Block = $event->getBlock();
 		$pos = new Vector3($Block->getX(), $Block->getY(), $Block->getZ());
-		$levelName = $event->getPlayer()->getLevel()->getName();
+		$levelName = $event->getPlayer()->getLevel()->getFolderName();
 		if($this->doesSignExist($pos, $levelName)){
 			if($event->getPlayer()->isOp()){ 
 				if($this->removeSign($pos, $levelName)){
 					$event->getPlayer()->sendMessage("[SSS] Sign sucessfully deleted!");
 				}else{
-					$this->server->broadcastMessage("CRITICAL/r005_FAIL::removeSign [Additional Info: removeSign() has returned false]");
+					$this->server->broadcast("CRITICAL/r005_FAIL::removeSign [Additional Info: removeSign() has returned false]", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
 				}
 				$this->recalcdRSvar();
 			}else{
@@ -227,19 +237,19 @@ class SignServerStats implements Listener{
 				if(!empty($sign[1])){
 					if(!empty($sign[2])){
 						$pos = new Vector3($event->getBlock()->x, $event->getBlock()->y, $event->getBlock()->z);
-						$levelName = $event->getBlock()->getLevel()->getName();
+						$levelName = $event->getBlock()->getLevel()->getFolderName();
 						$this->addSign($sign[1], $sign[2], $pos, $levelName);
 						$this->recalcdRSvar();
 						$event->getPlayer()->sendMessage("[SSS] The ServerStats Sign for the IP '".$sign[1]."' Port '".$sign[2]."' is set up correctly!");
 					}else{
 						$event->getPlayer()->sendMessage("[SSS] PORT_MISSING (LINE3)");
-						$this->server->broadcastMessage("r003_PORT_MISSING");
+						$this->server->broadcast("r003_PORT_MISSING", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
 						$event->setLine(0,"[BROKEN]");
 						return false;
 					}
 				}else{
 					$event->getPlayer()->sendMessage("[SSS] IP_MISSING (LINE2)");
-					$this->server->broadcastMessage("r004_IP_MISSING");
+					$this->server->broadcast("r004_IP_MISSING", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
 					$event->setLine(0,"[BROKEN]");
 					return false;
 				}
@@ -254,16 +264,14 @@ class SignServerStats implements Listener{
 }
 
 class SSSAsyncTaskCaller extends PluginTask{
-	public function __construct(rootPlugin $main, $parent){
+	public function __construct(rootPlugin $main, SignServerStats $parent){
 		parent::__construct($main);
-		$this->server = $parent->server;
 		$this->SSS = $parent;
 	}
 	
 	public function onRun($currentTick){
 		if($this->SSS->isAllowedToStartAsyncTask()){
-			$this->SSS->asyncTaskIsRunning = true;
-			$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->SSS->doCheckServers, $this->SSS->debug));
+			$this->SSS->startAsyncTask($currentTick);
 		}
 	}
 }
@@ -272,9 +280,12 @@ class SSSAsyncTask extends AsyncTask{
   private $serverFINALdata;
   private $doCheckServer;
   
-  public function __construct(array $doCheckServers, bool $debug){
+  private $startTick;
+  
+  public function __construct(array $doCheckServers, bool $debug, int $startTick){
 	  $this->doCheckServer = $doCheckServers;
 	  $this->debug = $debug;
+	  $this->startTick = $startTick;
   }
   
   private function doQuery(int $ip, int $port): array{
@@ -370,7 +381,7 @@ class SSSAsyncTask extends AsyncTask{
   }
   
   public function onCompletion(Server $server){
-	  $server->getPluginManager()->getPlugin("SignServerStats")->getAPI()->asyncTaskCallBack($this->getResult());
+	  $server->getPluginManager()->getPlugin("SignServerStats")->getAPI()->asyncTaskCallBack($this->getResult(), $this->startTick);
   }
 }
 //Theory is when you know something, but it doesn"t work. Practice is when something works, but you don"t know why. Programmers combine theory and practice: Nothing works and they don"t know why!
