@@ -20,18 +20,6 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\scheduler\PluginTask;
 
-class rootPlugin extends PluginBase{
-	private $sss;
-	
-	public function onEnable(){
-		@mkdir($this->getDataFolder());
-		$this->sss = new SignServerStats($this);
-	}
-
-	public function getAPI(){
-		return $this->sss;
-	}
-}
 /* _____ _____ _____ 
   / ____/ ____/ ____|
  | (___| (___| (___  
@@ -39,20 +27,20 @@ class rootPlugin extends PluginBase{
   ____) |___) |___) |
  |_____/_____/_____/ 
 */
-class SignServerStats implements Listener{
-	public $doCheckServers = [];
-	public $debug = false;
-	public $asyncTaskIsRunning = false;
+class SignServerStats extends PluginBase{
+	private $listener;
+	private $doCheckServers = [];
+	private $debug = false;
+	private $asyncTaskIsRunning = false;
 	private $server;
 	private $doRefreshSigns = [];
 	private $asyncTaskMODTs;
 	private $asyncTaskPlayers;
 	private $asyncTaskIsOnline;
-
-	public function __construct(rootPlugin $main){
-		$this->main = $main;
-		$this->server = $main->getServer();
-		$this->server->getPluginManager()->registerEvents($this, $this->main);
+	
+	public function onEnable(){
+		@mkdir($this->getDataFolder());
+		$this->server = $this->getServer();
 		$this->db = new Config($this->main->getDataFolder() . "SignServerStatsDB.yml", Config::YAML, array()); //TODO:betterDB
 		$this->SignServerStatsCfg = new Config($this->main->getDataFolder() . "SSSconfig.yml", Config::YAML, array());
 		if($this->SignServerStatsCfg->get("ConfigVersion") != 2){
@@ -65,8 +53,10 @@ class SignServerStats implements Listener{
 		if($this->SignServerStatsCfg->get('debug')){
 			$this->debug = true;
 		}
-		$this->server->getScheduler()->scheduleRepeatingTask(new SSSAsyncTaskCaller($this->main, $this), $this->SignServerStatsCfg->get("SSSAsyncTaskCaller"));
+		$this->listener = new SSSListener($this);
+		$this->server->getPluginManager()->registerEvents($this, $this->listener);
 		$this->recalcdRSvar();
+		$this->server->getScheduler()->scheduleRepeatingTask(new SSSAsyncTaskCaller($this->main, $this), $this->SignServerStatsCfg->get("SSSAsyncTaskCaller"));
 	}
 	
 	public function startAsyncTask($currTick){
@@ -80,8 +70,8 @@ class SignServerStats implements Listener{
 			return;
 		}
 		if($this->debug){
-			#echo("AsyncTaskResponse:\n");
-			#var_dump($data);
+			echo("AsyncTaskResponse:\n");
+			var_dump($data);
 		}
 		foreach($data as $serverID => $serverData){
 			$this->asyncTaskIsOnline[$serverID] = $serverData[2];
@@ -111,6 +101,14 @@ class SignServerStats implements Listener{
 	
 	public function getPlayerData(): array{
 		return $this->asyncTaskPlayers;
+	}
+	
+	public function debugEnabled(): bool{
+		return $this->debug;
+	}
+	
+	public function isAdmin(Player $player): bool{
+		return true;
 	}
 	
 	public function doSignRefresh(){
@@ -207,18 +205,29 @@ class SignServerStats implements Listener{
 		return $lines;
 	}
 	
+}
+
+class SSSListener implements Listener{
+	private $main;
+	private $server;
+	
+	public function __construct(SignServerStats $main){
+		$this->main = $main;
+		$this->server = $main->getServer();
+	}
+	
 	public function onBreak(BlockBreakEvent $event){ 
-		$Block = $event->getBlock();
-		$pos = new Vector3($Block->getX(), $Block->getY(), $Block->getZ());
+		$block = $event->getBlock();
+		$pos = new Vector3($block->getX(), $block->getY(), $block->getZ());
 		$levelName = $event->getPlayer()->getLevel()->getFolderName();
-		if($this->doesSignExist($pos, $levelName)){
-			if($event->getPlayer()->isOp()){ 
-				if($this->removeSign($pos, $levelName)){
+		if($this->main->doesSignExist($pos, $levelName)){
+			if($this->main->isAdmin($event->getPlayer())){ 
+				if($this->main->removeSign($pos, $levelName)){
 					$event->getPlayer()->sendMessage("[SSS] Sign sucessfully deleted!");
 				}else{
 					$this->server->broadcast("CRITICAL/r005_FAIL::removeSign [Additional Info: removeSign() has returned false]", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
 				}
-				$this->recalcdRSvar();
+				$this->main->recalcdRSvar();
 			}else{
 				$event->getPlayer()->sendMessage("[SSS] No, you are not allowed to do that!");
 				$event->setCancelled();
@@ -233,13 +242,13 @@ class SignServerStats implements Listener{
 		}
 		$sign = $event->getLines();
 		if($sign[0]=='[SSS]'){
-			if($event->getPlayer()->isOp()){
+			if($this->main->isAdmin($event->getPlayer())){
 				if(!empty($sign[1])){
 					if(!empty($sign[2])){
 						$pos = new Vector3($event->getBlock()->x, $event->getBlock()->y, $event->getBlock()->z);
 						$levelName = $event->getBlock()->getLevel()->getFolderName();
-						$this->addSign($sign[1], $sign[2], $pos, $levelName);
-						$this->recalcdRSvar();
+						$this->main->addSign($sign[1], $sign[2], $pos, $levelName);
+						$this->main->recalcdRSvar();
 						$event->getPlayer()->sendMessage("[SSS] The ServerStats Sign for the IP '".$sign[1]."' Port '".$sign[2]."' is set up correctly!");
 					}else{
 						$event->getPlayer()->sendMessage("[SSS] PORT_MISSING (LINE3)");
@@ -276,6 +285,7 @@ class SSSAsyncTaskCaller extends PluginTask{
 	}
 }
 
+/** @todo Local complex */
 class SSSAsyncTask extends AsyncTask{
   private $serverFINALdata;
   private $doCheckServer;
