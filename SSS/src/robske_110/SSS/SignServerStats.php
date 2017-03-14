@@ -9,16 +9,11 @@
 namespace robske_110\SSS;
 
 use pocketmine\event\Listener;
-use pocketmine\event\block\BlockBreakEvent;
-use pocketmine\event\block\SignChangeEvent;
-use pocketmine\tile\Sign;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 use pocketmine\Server;
 use pocketmine\plugin\PluginBase;
-use pocketmine\scheduler\AsyncTask;
-use pocketmine\scheduler\PluginTask;
 
 /* _____ _____ _____ 
   / ____/ ____/ ____|
@@ -29,10 +24,12 @@ use pocketmine\scheduler\PluginTask;
 */
 class SignServerStats extends PluginBase{
 	private $listener;
+	private $signServerStatsCfg;
+	private $db;
+	private $server;
 	private $doCheckServers = [];
 	private $debug = false;
 	private $asyncTaskIsRunning = false;
-	private $server;
 	private $doRefreshSigns = [];
 	private $asyncTaskMODTs;
 	private $asyncTaskPlayers;
@@ -42,21 +39,21 @@ class SignServerStats extends PluginBase{
 		@mkdir($this->getDataFolder());
 		$this->server = $this->getServer();
 		$this->db = new Config($this->main->getDataFolder() . "SignServerStatsDB.yml", Config::YAML, array()); //TODO:betterDB
-		$this->SignServerStatsCfg = new Config($this->main->getDataFolder() . "SSSconfig.yml", Config::YAML, array());
-		if($this->SignServerStatsCfg->get("ConfigVersion") != 2){
-			$this->SignServerStatsCfg->set('SSSAsyncTaskCall', 200);
-			$this->SignServerStatsCfg->set('always-start-async-task', false);
-			$this->SignServerStatsCfg->set('debug', false);
-			$this->SignServerStatsCfg->set('ConfigVersion', 2);
+		$this->signServerStatsCfg = new Config($this->main->getDataFolder() . "SSSconfig.yml", Config::YAML, array());
+		if($this->signServerStatsCfg->get("ConfigVersion") != 2){
+			$this->signServerStatsCfg->set('SSSAsyncTaskCall', 200);
+			$this->signServerStatsCfg->set('always-start-async-task', false);
+			$this->signServerStatsCfg->set('debug', false);
+			$this->signServerStatsCfg->set('ConfigVersion', 2);
 		}
-		$this->SignServerStatsCfg->save();
-		if($this->SignServerStatsCfg->get('debug')){
+		$this->signServerStatsCfg->save();
+		if($this->signServerStatsCfg->get('debug')){
 			$this->debug = true;
 		}
 		$this->listener = new SSSListener($this);
 		$this->server->getPluginManager()->registerEvents($this, $this->listener);
 		$this->recalcdRSvar();
-		$this->server->getScheduler()->scheduleRepeatingTask(new SSSAsyncTaskCaller($this->main, $this), $this->SignServerStatsCfg->get("SSSAsyncTaskCaller"));
+		$this->server->getScheduler()->scheduleRepeatingTask(new SSSAsyncTaskCaller($this->main, $this), $this->signServerStatsCfg->get("SSSAsyncTaskCaller"));
 	}
 	
 	public function startAsyncTask($currTick){
@@ -82,13 +79,13 @@ class SignServerStats extends PluginBase{
 		}
 		$this->doSignRefresh();
 		$currTick = $this->server->getTick();
-		if($currTick - $scheduleTime >= $this->SignServerStatsCfg->get('SSSAsyncTaskCall')){
+		if($currTick - $scheduleTime >= $this->signServerStatsCfg->get('SSSAsyncTaskCall')){
 			$this->startAsyncTask($currTick);
 		}
 	}
 	
 	public function isAllowedToStartAsyncTask(): bool{
-		return $this->SignServerStatsCfg->get('always-start-async-task') ? true : !$this->asyncTaskIsRunning;
+		return $this->signServerStatsCfg->get('always-start-async-task') ? true : !$this->asyncTaskIsRunning;
 	}
 	
 	public function getOnlineServers(): array{
