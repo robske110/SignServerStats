@@ -12,7 +12,6 @@ use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\SignChangeEvent;
 use pocketmine\tile\Sign;
-use pocketmine\math\Vector3;
 
 class SSSListener implements Listener{
 	private $main;
@@ -25,11 +24,10 @@ class SSSListener implements Listener{
 	
 	public function onBreak(BlockBreakEvent $event){ 
 		$block = $event->getBlock();
-		$pos = new Vector3($block->getX(), $block->getY(), $block->getZ());
 		$levelName = $event->getPlayer()->getLevel()->getFolderName();
-		if($this->main->doesSignExist($pos, $levelName)){
+		if($this->main->doesSignExist($block, $levelName)){
 			if($this->main->isAdmin($event->getPlayer())){ 
-				if($this->main->removeSign($pos, $levelName)){
+				if($this->main->removeSign($block, $levelName)){
 					$event->getPlayer()->sendMessage("[SSS] Sign sucessfully deleted!");
 				}else{
 					$this->server->broadcast("CRITICAL/r005_FAIL::removeSign [Additional Info: removeSign() has returned false]", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
@@ -43,7 +41,8 @@ class SSSListener implements Listener{
 	}
 	
 	public function signUpdate(SignChangeEvent $event){
-		$sign = $event->getPlayer()->getLevel()->getTile($event->getBlock());
+		$block = $event->getBlock();
+		$sign = $event->getPlayer()->getLevel()->getTile($block);
 		if(!($sign instanceof Sign)){
 			return true;
 		}
@@ -52,10 +51,10 @@ class SSSListener implements Listener{
 			if($this->main->isAdmin($event->getPlayer())){
 				if(!empty($sign[1])){
 					if(!empty($sign[2])){
-						$pos = new Vector3($event->getBlock()->x, $event->getBlock()->y, $event->getBlock()->z);
-						$levelName = $event->getBlock()->getLevel()->getFolderName();
-						$this->main->addSign($sign[1], $sign[2], $pos, $levelName);
+						$levelName = $block->getLevel()->getFolderName();
+						$this->main->addSign($sign[1], $sign[2], $block, $levelName);
 						$this->main->recalcdRSvar();
+						$event->setLines($this->main-calcSign([$sign[1], $sign[2]]));
 						$event->getPlayer()->sendMessage("[SSS] The ServerStats Sign for the IP '".$sign[1]."' Port '".$sign[2]."' is set up correctly!");
 					}else{
 						$event->getPlayer()->sendMessage("[SSS] PORT_MISSING (LINE3)");

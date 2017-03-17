@@ -23,7 +23,7 @@ class SSSAsyncTask extends AsyncTask{
 	  $this->startTick = $startTick;
   }
   
-  private function doQuery(int $ip, int $port): array{
+  private function doQuery(string $ip, int $port): array{
   	  if($this->debug){
   	  	echo("doQuery:\n");
   	  }
@@ -77,16 +77,16 @@ class SSSAsyncTask extends AsyncTask{
   
   public function onRun(){
   	  if($this->debug){
-	  	echo("DoCheckServer:\n");
+		  echo("DoCheckServer:\n");
 		  var_dump($this->doCheckServer);
   	  }
 	  foreach($this->doCheckServer as $server){
 		  $doCheck = $server[1];
 		  if($doCheck){
-			  $ip = $server[0];
-			  $deParsedIP = $ip[0];
-			  $port = $ip[1];
-			  $return = $this->doQuery($deParsedIP, $port);
+			  $adressArray = $server[0];
+			  $ip = $adressArray[0];
+			  $port = $adressArray[1];
+			  $return = $this->doQuery($ip, $port);
 			  $returnState = $return[0];
 			  $queryResult = $return[1];
 			  $serverData = [];
@@ -106,10 +106,10 @@ class SSSAsyncTask extends AsyncTask{
 				      $serverData[1] = $queryResult['hostname'];
 					  $serverData[2] = true;
 			  }
-			  $serverFINALdata[$deParsedIP.$port] = $serverData;
-			  $this->setResult($serverFINALdata);
+			  $serverFINALdata[$ip.$port] = $serverData;
 		  }
 	  }
+	  $this->setResult($serverFINALdata);
 	  if($this->debug){
 	  	echo("\n");
 	  }

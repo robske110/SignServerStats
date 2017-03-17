@@ -1,6 +1,13 @@
 name: SignServerStats
 api: [3.0.0-ALPHA3, 3.0.0-ALPHA4]
-version: 1.0.0-InDev
+version: 1.0.0-InDev-beta1
 load: POSTWORLD
 main: robske_110\SSS\SignServerStats
 author: robske_110
+
+permissions:
+ SSS:
+  description: "Allows to use all SSS features"
+  children:
+   SSS.signs:
+     description: "Allows to create [SSS] signs and destroy them"
