@@ -38,8 +38,8 @@ if(isset($serverOnlineArray["someip.com".1234])){
 
 - [x] implement proper permissions
 
-- [] sign style config
+- [ ] sign style config
 
-- [] playerlist?
+- [ ] playerlist?
 
-- ~language system~ Makes no sense.
+- [ ] ~language system~ Makes no sense.
