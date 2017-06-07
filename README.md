@@ -48,8 +48,8 @@ if(isset($serverOnlineArray["someip.com".'1234'])){
 
 - [] Fire event onAsyncCallBack for easier API use
 
-- [] API should be able to also get other data (playernamelist, pluginlist)
+- [ ] API should be able to also get other data (playernamelist, pluginlist)
 
-- [] sign style config
+- [ ] sign style config
 
 - [x] implement proper permissions
