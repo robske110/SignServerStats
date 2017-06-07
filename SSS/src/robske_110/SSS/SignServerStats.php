@@ -37,6 +37,8 @@ class SignServerStats extends PluginBase{
 	private $asyncTaskPlayers;
 	private $asyncTaskIsOnline;
 	
+	const API_VERSION = "1.0.0";
+	
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
 		$this->server = $this->getServer();
@@ -88,6 +90,18 @@ class SignServerStats extends PluginBase{
 	
 	public function isAllowedToStartAsyncTask(): bool{
 		return $this->signServerStatsCfg->get('always-start-async-task') ? true : !$this->asyncTaskIsRunning;
+	}
+	
+	public function isCompatible(string $apiVersion): bool{
+		$extensionApiVersion = explode($yourApiVer, ".");
+		$myApiVersion = exploide(self::API_VERSION, ".");
+		if($extensionApiVersion[0] !== $extensionApiVersion[1]){
+			return false;
+		}
+		if($extensionApiVersion[1] > $extensionApiVersion[1]){
+			return false;
+		}
+		return true;
 	}
 	
 	public function getServerOnline(): array{
