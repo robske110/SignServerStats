@@ -12,6 +12,8 @@ Anyone with the permission SSS.signs can create a sign with the following conten
 
 The plugin will recognize that sign and fill it with colorful stats!
 
+*Note: Due to 1.1 not telling the server when the sign is finished, you need to tap the sign once to activate it after setting it up.*
+
 ### API:
 ##### This plugin can also be used as a query API. You might want to look into SignServerStats.php, because all the API functions are in there.
 Example plugins are provided in /examples/:
