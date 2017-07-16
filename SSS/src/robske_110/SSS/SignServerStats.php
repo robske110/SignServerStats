@@ -33,9 +33,9 @@ class SignServerStats extends PluginBase{
 	private $debug = false;
 	private $asyncTaskIsRunning = false;
 	private $doRefreshSigns = [];
-	private $asyncTaskMODTs;
-	private $asyncTaskPlayers;
-	private $asyncTaskIsOnline;
+	private $asyncTaskMODTs = [];
+	private $asyncTaskPlayers = [];
+	private $asyncTaskIsOnline = [];
 	
 	const API_VERSION = "1.0.0";
 	
@@ -93,12 +93,12 @@ class SignServerStats extends PluginBase{
 	}
 	
 	public function isCompatible(string $apiVersion): bool{
-		$extensionApiVersion = explode($yourApiVer, ".");
-		$myApiVersion = exploide(self::API_VERSION, ".");
-		if($extensionApiVersion[0] !== $extensionApiVersion[1]){
+		$extensionApiVersion = explode(".", $apiVersion);
+		$myApiVersion = explode(".", self::API_VERSION);
+		if($extensionApiVersion[0] !== $myApiVersion[0]){
 			return false;
 		}
-		if($extensionApiVersion[1] > $extensionApiVersion[1]){
+		if($extensionApiVersion[1] > $myApiVersion[1]){
 			return false;
 		}
 		return true;
@@ -109,7 +109,7 @@ class SignServerStats extends PluginBase{
 	}
 	
 	public function getMODTs(): array{
-		return $this->asyncMODTs;
+		return $this->asyncTaskMODTs;
 	}
 	
 	public function getPlayerData(): array{
@@ -176,6 +176,7 @@ class SignServerStats extends PluginBase{
 				$this->db->remove($key);
 				$signArray = $this->db->getAll();
 				$signArray = array_values($signArray);
+				$this->doRefreshSigns = $signArray;
 				$this->db->setAll($signArray);
 				$this->db->save(true);
 				$this->removeServer($signData[1][0], $signData[1][1]);

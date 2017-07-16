@@ -12,6 +12,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\SignChangeEvent;
 use pocketmine\tile\Sign;
+use pocketmine\Server;
 
 class SSSListener implements Listener{
 	private $main;
@@ -54,8 +55,8 @@ class SSSListener implements Listener{
 						$levelName = $block->getLevel()->getFolderName();
 						$this->main->addSign($sign[1], $sign[2], $block, $levelName);
 						$this->main->recalcdRSvar();
-						$event->setLines($this->main-calcSign([$sign[1], $sign[2]]));
-						$event->getPlayer()->sendMessage("[SSS] The ServerStats Sign for the IP '".$sign[1]."' Port '".$sign[2]."' is set up correctly!");
+						$event->setLines($this->main->calcSign([$sign[1], $sign[2]]));
+						$event->getPlayer()->sendMessage("[SSS] The ServerStats Sign for the IP '".$sign[1]."' Port '".$sign[2]."' has been set up correctly!");
 					}else{
 						$event->getPlayer()->sendMessage("[SSS] PORT_MISSING (LINE3)");
 						$this->server->broadcast("r003_PORT_MISSING", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);

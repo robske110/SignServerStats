@@ -13,14 +13,14 @@ Anyone with the permission SSS.signs can create a sign with the following conten
 The plugin will recognize that sign and fill it with colorful stats!
 
 ### API:
-This plugin can also be used as a query API. You might want to look into SignServerStats.php, because all the API functions are in there.
+##### This plugin can also be used as a query API. You might want to look into SignServerStats.php, because all the API functions are in there.
 Example plugins are provided in /examples/:
-DumpInfo.php - Dumps all availible info about a server.
-These two examples may also be useful for users, so they are also provided as phars in every release:
-WarnOffline/ - Warns if a server has gone offline.
-StatusList/ - Lists online status and player count of multiple servers in a List.
+- DumpInfo.php - Dumps all availible info about a server.
+Because the following two examples may also be useful for users, so they are also provided as phars in every release:
+- WarnOffline/ - Warns if a server has gone offline.
+- StatusList/ - Lists online status and player count of multiple servers in a List.
 
-If you prefer just a quick introduction, here is one for getting the the online status of the server `someip.com:1234:
+#### If you prefer just a quick introduction, here is one for getting the the online status of the server `someip.com:1234:
 
 Initial, for example onEnable:
 ```php
@@ -29,7 +29,7 @@ $sss->addServer("someip.com", 1234);
 ```
 This tells SSS that it should query that server in its next query.
 
-#####IMPORTANT: You have to wait until the information is fetched asynchronously.
+##### IMPORTANT: You have to wait until the information is fetched asynchronously.
 
 To check if the server is online simply do this, it is recommended to do this in a task.
 ```php
@@ -46,7 +46,7 @@ if(isset($serverOnlineArray["someip.com".'1234'])){
 
 ## TODO:
 
-- [] Fire event onAsyncCallBack for easier API use
+- [ ] Fire event onAsyncCallBack for easier API use
 
 - [ ] API should be able to also get other data (playernamelist, pluginlist)
 

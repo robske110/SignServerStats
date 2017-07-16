@@ -18,7 +18,7 @@ class SSSAsyncTaskCaller extends PluginTask{
 		$this->SSS = $main;
 	}
 	
-	public function onRun($currentTick){
+	public function onRun(int $currentTick){
 		if($this->SSS->isAllowedToStartAsyncTask()){
 			$this->SSS->startAsyncTask($currentTick);
 		}

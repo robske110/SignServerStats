@@ -4,7 +4,7 @@
  * @name DumpServerInfo
  * @main robske_110\DPS\DumpServerInfo
  * @version 1.0.0-beta
- * @api 3.0.0-ALPHA4
+ * @api 3.0.0-ALPHA7
  * @description Dumps query info of a Server using SignServerStats
  * @author robske_110
  * @licnese LGPLv3
@@ -22,10 +22,14 @@ namespace robske_110\DPS{
 	use pocketmine\command\Command;
 	use pocketmine\command\CommandSender;
 	use pocketmine\utils\TextFormat as TF;
+	use pocketmine\scheduler\PluginTask;
 
 	class DumpServerInfo extends PluginBase{
 		
 		const API_VERSION = "1.0.0";
+		
+		/** @var DisplayTask */
+		private $displayTask;
 		
 		public function onLoad(){
 			$id = ScriptPluginCommands::initFor($this);
@@ -41,44 +45,47 @@ namespace robske_110\DPS{
 		public function onEnable(){
 			if(($sss = $this->getSSS()) !== NULL){
 				if(!$sss->isCompatible(self::API_VERSION)){
-					$newOld = version_compare(self::API_VERSION, SignServerStats::API_VERSION);
+					$newOld = version_compare(self::API_VERSION, SignServerStats::API_VERSION, ">") ? "old" : "new";
 					$this->getLogger()->critical("Your version of PlateWarp is too ".$newOld." for this plugin.");
+					$this->getServer()->getPluginManager()->disablePlugin($this);
+					return;
 				}
 			}else{
 				$this->getLogger()->critical("This plugin needs PlateWarp. And I couldn't find it :/");
+				$this->getServer()->getPluginManager()->disablePlugin($this);
+				return;
 			}
-		}
-		
-		public function onDisable(){
-			Utils::close();
+			$this->displayTask = new DisplayTask($this);
+			$this->getServer()->getScheduler()->scheduleRepeatingTask($this->displayTask, 10);
 		}
 		
 		public function getSSS(){
-			if(($sss = $server->getPluginManager()->getPlugin("SignServerStats")) instanceof SignServerStats){
+			if(($sss = $this->getServer()->getPluginManager()->getPlugin("SignServerStats")) instanceof SignServerStats){
 				return $sss;
 			}else{
-				$this->getLogger()->critical("Something unexpected happened and you obviously want to know what, so here you are: Trying to get SignServerStats plugin instance failed!");
+				$this->getLogger()->critical("Unexpected error: Trying to get SignServerStats plugin instance failed!");
 				return NULL;
 			}
 		}
 		
-		public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+		public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool{
 			if($command->getName() == "dumpinfo"){
 				if(isset($args[0])){
 					$hostname = $args[0];
 					$port = 19132;
 					if(isset($args[1])){
-						if(is_int($args[1])){
+						if(is_numeric($args[1])){
 							$port = $args[1];
 						}else{
 							return false;
 						}
-						if(($sss = $this->getSSS()) === NULL){
-							$this->sss->addServer($hostname, $port);
-							$sender->sendMessage("Getting info for the server ".$hostname.":".$ip."...");
-						}else{
-							$sender->sendMessage("SSS is not enabled anymore, it may have crashed.");
-						}
+					}
+					if(($sss = $this->getSSS()) !== NULL){
+						$sss->addServer($hostname, $port);
+						$this->displayTask->addServer($hostname, $port, $sender);
+						$sender->sendMessage("Getting info for the server ".$hostname.":".$port."...");
+					}else{
+						$sender->sendMessage("SSS is not enabled anymore, it might have crashed.");
 					}
 					return true;
 				}
@@ -96,7 +103,11 @@ namespace robske_110\DPS{
 	        $this->plugin = $plugin;
 	    }
 	
-		public function onRun($currentTick){
+		public function addServer(string $hostname, int $port, CommandSender $sender){
+			$this->checkServers[] = [$hostname, $port, $sender];
+		}
+	
+		public function onRun(int $currentTick){
 			$sss = $this->plugin->getSSS();
 			if($sss === NULL){
 				$this->plugin->getLogger()->critical("SSS is not enabled anymore, it may have crashed.");
@@ -108,6 +119,7 @@ namespace robske_110\DPS{
 						$server[2]->sendMessage($msg);
 					}
 					unset($this->checkServers[$index]);
+					$sss->removeServer($server[0], $server[1]); //Warning: In future versions of SSS it could also immediately remove data, therfore breaking multiple requests at once.
 				}
 			}
 			$this->checkServers = array_values($this->checkServers);
@@ -115,9 +127,9 @@ namespace robske_110\DPS{
 	
 		private function dumpServer($hostname, $port, SignServerStats $sss): array{
 			$msgs = [];
-			$msgs[] = "Dump for server ".$hostname.":".$ip.":";
 			$serverOnlineArray = $sss->getServerOnline();
 			if(isset($serverOnlineArray[$hostname.$port])){
+				$msgs[] = "Dump for server ".$hostname.":".$port.":";
 			    $isOnline = $serverOnlineArray[$hostname.$port];
 			    if($isOnline){
 		    		$msgs[] = "Status: Online";
