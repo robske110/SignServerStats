@@ -60,50 +60,6 @@ class SignServerStats extends PluginBase{
 		$this->server->getScheduler()->scheduleRepeatingTask(new SSSAsyncTaskCaller($this), $this->signServerStatsCfg->get("SSSAsyncTaskCall"));
 	}
 	
-	public function startAsyncTask($currTick){
-		$this->asyncTaskIsRunning = true;
-		$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $currTick));
-	}
-	
-	public function asyncTaskCallBack($data, $scheduleTime){
-		$this->asyncTaskIsRunning = false;
-		if(!is_array($data)){
-			return;
-		}
-		if($this->debug){
-			echo("AsyncTaskResponse:\n");
-			var_dump($data);
-		}
-		foreach($data as $serverID => $serverData){
-			$this->asyncTaskIsOnline[$serverID] = $serverData[2];
-			if($serverData[2]){
-				$this->asyncTaskMODTs[$serverID] = $serverData[1];
-				$this->asyncTaskPlayers[$serverID] = $serverData[0];
-			}
-		}
-		$this->doSignRefresh();
-		$currTick = $this->server->getTick();
-		if($currTick - $scheduleTime >= $this->signServerStatsCfg->get('SSSAsyncTaskCall')){
-			$this->startAsyncTask($currTick);
-		}
-	}
-	
-	public function isAllowedToStartAsyncTask(): bool{
-		return $this->signServerStatsCfg->get('always-start-async-task') ? true : !$this->asyncTaskIsRunning;
-	}
-	
-	public function isCompatible(string $apiVersion): bool{
-		$extensionApiVersion = explode(".", $apiVersion);
-		$myApiVersion = explode(".", self::API_VERSION);
-		if($extensionApiVersion[0] !== $myApiVersion[0]){
-			return false;
-		}
-		if($extensionApiVersion[1] > $myApiVersion[1]){
-			return false;
-		}
-		return true;
-	}
-	
 	public function getServerOnline(): array{
 		return $this->asyncTaskIsOnline;
 	}
@@ -198,6 +154,62 @@ class SignServerStats extends PluginBase{
 		$this->recalcdRSvar(); //Do not allow removing a server for a sign.
 	}
 	
+	/**
+	  * @internal
+	  */
+	public function startAsyncTask($currTick){
+		$this->asyncTaskIsRunning = true;
+		$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $currTick));
+	}
+	
+	/**
+	  * @internal
+	  */
+	public function asyncTaskCallBack($data, $scheduleTime){
+		$this->asyncTaskIsRunning = false;
+		if(!is_array($data)){
+			return;
+		}
+		if($this->debug){
+			$this->getLogger()->debug("AsyncTaskResponse:");
+			var_dump($data);
+		}
+		foreach($data as $serverID => $serverData){
+			$this->asyncTaskIsOnline[$serverID] = $serverData[2];
+			if($serverData[2]){
+				$this->asyncTaskMODTs[$serverID] = $serverData[1];
+				$this->asyncTaskPlayers[$serverID] = $serverData[0];
+			}
+		}
+		$this->doSignRefresh();
+		$currTick = $this->server->getTick();
+		if($currTick - $scheduleTime >= $this->signServerStatsCfg->get('SSSAsyncTaskCall')){
+			$this->startAsyncTask($currTick);
+		}
+	}
+	
+	/**
+	  * @internal
+	  */
+	public function isAllowedToStartAsyncTask(): bool{
+		return $this->signServerStatsCfg->get('always-start-async-task') ? true : !$this->asyncTaskIsRunning;
+	}
+	
+	public function isCompatible(string $apiVersion): bool{
+		$extensionApiVersion = explode(".", $apiVersion);
+		$myApiVersion = explode(".", self::API_VERSION);
+		if($extensionApiVersion[0] !== $myApiVersion[0]){
+			return false;
+		}
+		if($extensionApiVersion[1] > $myApiVersion[1]){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	  * @internal
+	  */
 	public function recalcdRSvar(){
 		foreach($this->doRefreshSigns as $signData){
 			$refreshSignIP = $signData[1];
