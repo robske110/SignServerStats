@@ -195,6 +195,7 @@ class SignServerStats extends PluginBase{
 			return true;
 		}
 		return false;
+		$this->recalcdRSvar(); //Do not allow removing a server for a sign.
 	}
 	
 	public function recalcdRSvar(){
