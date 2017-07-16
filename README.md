@@ -22,7 +22,8 @@ Because the following two examples may also be useful for users, so they are als
 - WarnOffline/ - Warns if a server has gone offline.
 - StatusList/ - Lists online status and player count of multiple servers in a List.
 
-#### If you prefer just a quick introduction, here is one for getting the the online status of the server `someip.com:1234:
+#### If you prefer just a quick introduction, here is one for getting the the online status of the server `someip.com:1234`:
+=======
 
 Initial, for example onEnable:
 ```php
