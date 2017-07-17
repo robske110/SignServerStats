@@ -56,6 +56,7 @@ class SignServerStats extends PluginBase{
 		}
 		$this->listener = new SSSListener($this);
 		$this->server->getPluginManager()->registerEvents($this->listener, $this);
+		$this->doRefreshSigns = $this->db->getAll();
 		$this->recalcdRSvar();
 		$this->server->getScheduler()->scheduleRepeatingTask(new SSSAsyncTaskCaller($this), $this->signServerStatsCfg->get("SSSAsyncTaskCall"));
 	}
