@@ -42,8 +42,8 @@ class SignServerStats extends PluginBase{
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
 		$this->server = $this->getServer();
-		$this->db = new Config($this->getDataFolder() . "SignServerStatsDB.yml", Config::YAML, array()); //TODO:betterDB
-		$this->signServerStatsCfg = new Config($this->getDataFolder() . "SSSconfig.yml", Config::YAML, array());
+		$this->db = new Config($this->getDataFolder() . "SignServerStatsDB.yml", Config::YAML, []); //TODO:betterDB
+		$this->signServerStatsCfg = new Config($this->getDataFolder() . "SSSconfig.yml", Config::YAML, []);
 		if($this->signServerStatsCfg->get("ConfigVersion") != 2){
 			$this->signServerStatsCfg->set('SSSAsyncTaskCall', 200);
 			$this->signServerStatsCfg->set('always-start-async-task', false);
@@ -143,16 +143,16 @@ class SignServerStats extends PluginBase{
 	}
 	
 	public function addServer(string $ip, int $port, bool $active = true){
-		$this->doCheckServers[$ip.$port] = [[$ip, $port], $active];
+		$this->doCheckServers[$ip."@".$port] = [[$ip, $port], $active];
 	}
 	
 	public function removeServer(string $ip, int $port): bool{
-		if(isset($this->doCheckServers[$ip.$port])){
-			unset($this->doCheckServers[$ip.$port]);
+		if(isset($this->doCheckServers[$ip."@".$port])){
+			unset($this->doCheckServers[$ip."@".$port]);
+			$this->recalcdRSvar(); //Do not allow removing a server for a sign.
 			return true;
 		}
 		return false;
-		$this->recalcdRSvar(); //Do not allow removing a server for a sign.
 	}
 	
 	/**
@@ -224,11 +224,11 @@ class SignServerStats extends PluginBase{
 	public function calcSign(array $adress): array{
 		$ip = $adress[0];
 		$port = $adress[1];
-		if(isset($this->asyncTaskIsOnline[$ip.$port])){
-			$isOnline = $this->asyncTaskIsOnline[$ip.$port];
+		if(isset($this->asyncTaskIsOnline[$ip."@".$port])){
+			$isOnline = $this->asyncTaskIsOnline[$ip."@".$port];
 			if($isOnline){
-				$MODT = $this->asyncTaskMODTs[$ip.$port];
-				$playerData = $this->asyncTaskPlayers[$ip.$port];
+				$MODT = $this->asyncTaskMODTs[$ip."@".$port];
+				$playerData = $this->asyncTaskPlayers[$ip."@".$port];
 				$currentPlayers = $playerData[0];
 				$maxPlayers = $playerData[1];
 				$lines[0] = $MODT;

@@ -106,7 +106,7 @@ class SSSAsyncTask extends AsyncTask{
 				      $serverData[1] = $queryResult['hostname'];
 					  $serverData[2] = true;
 			  }
-			  $serverFINALdata[$ip.$port] = $serverData;
+			  $serverFINALdata[$ip."@".$port] = $serverData;
 		  }
 	  }
 	  $this->setResult($serverFINALdata);
@@ -119,7 +119,7 @@ class SSSAsyncTask extends AsyncTask{
 	  if($server->getPluginManager()->getPlugin("SignServerStats") instanceof SignServerStats){
 		  $server->getPluginManager()->getPlugin("SignServerStats")->asyncTaskCallBack($this->getResult(), $this->startTick);
 	  }else{
-		  echo("Warning: Async Task started by SignServerStats could not find SignServerStats; arborting");
+		  echo("Warning: Async Task started by SignServerStats could not find SignServerStats; aborting");
 	  }
   }
 }

@@ -3,11 +3,11 @@
 /**
  * @name DumpServerInfo
  * @main robske_110\DPS\DumpServerInfo
- * @version 1.0.0-beta
+ * @version 1.0.0
  * @api 3.0.0-ALPHA7
  * @description Dumps query info of a Server using SignServerStats
  * @author robske_110
- * @licnese LGPLv3
+ * @license MIT
  */
 
 
@@ -46,12 +46,12 @@ namespace robske_110\DPS{
 			if(($sss = $this->getSSS()) !== NULL){
 				if(!$sss->isCompatible(self::API_VERSION)){
 					$newOld = version_compare(self::API_VERSION, SignServerStats::API_VERSION, ">") ? "old" : "new";
-					$this->getLogger()->critical("Your version of PlateWarp is too ".$newOld." for this plugin.");
+					$this->getLogger()->critical("Your version of SignServerStats is too ".$newOld." for this plugin.");
 					$this->getServer()->getPluginManager()->disablePlugin($this);
 					return;
 				}
 			}else{
-				$this->getLogger()->critical("This plugin needs PlateWarp. And I couldn't find it :/");
+				$this->getLogger()->critical("This plugin needs SignServerStats. And I couldn't find it :/");
 				$this->getServer()->getPluginManager()->disablePlugin($this);
 				return;
 			}
