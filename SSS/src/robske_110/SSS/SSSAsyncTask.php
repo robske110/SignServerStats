@@ -12,9 +12,9 @@ use pocketmine\Server;
 use pocketmine\scheduler\AsyncTask;
 
 class SSSAsyncTask extends AsyncTask{
-  private $serverFINALdata;
   private $doCheckServer;
   
+  private $debug;
   private $startTick;
   
   public function __construct(array $doCheckServers, bool $debug, int $startTick){
@@ -69,10 +69,7 @@ class SSSAsyncTask extends AsyncTask{
           if ($type == 1) $return[$val] = $key;
           $type == 0 ? $type = 1 : $type = 0;
 	  }	
-  	  return [1, $return]; 
-  	  if($this->debug){
-	  	echo("DoQueryEnd\n");
-  	  }
+  	  return [1, $return];
   }
   
   public function onRun(){

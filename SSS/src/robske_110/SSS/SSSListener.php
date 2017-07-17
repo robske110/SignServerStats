@@ -77,12 +77,12 @@ class SSSListener implements Listener{
 							}else{
 								$event->getPlayer()->sendMessage("[SSS] PORT_MISSING (LINE3)");
 								$this->server->broadcast("r003_PORT_MISSING", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
-								$event->setLine(0,"[BROKEN]");
+								$signTile->setLine(0,"[BROKEN]");
 							}
 						}else{
 							$event->getPlayer()->sendMessage("[SSS] IP_MISSING (LINE2)");
 							$this->server->broadcast("r004_IP_MISSING", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
-							$event->setLine(0,"[BROKEN]");
+							$signTile->setLine(0,"[BROKEN]");
 						}
 					}else{
 						$event->getPlayer()->sendMessage("[SSS] No, you are not allowed to do that!");

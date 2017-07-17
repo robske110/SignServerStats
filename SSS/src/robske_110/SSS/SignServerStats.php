@@ -8,7 +8,6 @@
 */
 namespace robske_110\SSS;
 
-use pocketmine\event\Listener;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\Config;
@@ -25,10 +24,17 @@ use pocketmine\tile\Sign;
  |_____/_____/_____/ 
 */
 class SignServerStats extends PluginBase{
+    /** @var SSSListener */
 	private $listener;
+
+	/** @var Config */
 	private $signServerStatsCfg;
+	/** @var Config */
 	private $db;
+
+	/** @var Server */
 	private $server;
+
 	private $doCheckServers = [];
 	private $debug = false;
 	private $asyncTaskIsRunning = false;
@@ -86,7 +92,7 @@ class SignServerStats extends PluginBase{
 			$pos = $signData[0];
 			$adress = $signData[1];
 			if($this->server->loadLevel($pos[3])){
-				$signTile = $this->server->getLevelByName($pos[3])->getTile(new Vector3($pos[0], $pos[1], $pos[2], $pos[3]));
+				$signTile = $this->server->getLevelByName($pos[3])->getTile(new Vector3($pos[0], $pos[1], $pos[2]));
 				if($signTile instanceof Sign){
 					$lines = $this->calcSign($adress);
 					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
