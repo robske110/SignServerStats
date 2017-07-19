@@ -181,6 +181,9 @@ class SignServerStats extends PluginBase{
 			$this->getLogger()->debug("AsyncTaskResponse:");
 			var_dump($data);
 		}
+		$this->asyncTaskMODTs = [];
+		$this->asyncTaskPlayers = [];
+		$this->asyncTaskIsOnline = [];
 		foreach($data as $serverID => $serverData){
 			$this->asyncTaskIsOnline[$serverID] = $serverData[2];
 			if($serverData[2]){
@@ -237,10 +240,10 @@ class SignServerStats extends PluginBase{
 				$playerData = $this->asyncTaskPlayers[$ip."@".$port];
 				$currentPlayers = $playerData[0];
 				$maxPlayers = $playerData[1];
-				$lines[0] = $MODT;
+				$lines[0] = $MODT ?? TF::DARK_RED."ERROR";
 				$lines[1] = "IP: ".TF::GREEN.$ip;
 				$lines[2] = "Port: ".TF::DARK_GREEN.$port;
-				$lines[3] = TF::DARK_GREEN.$currentPlayers.TF::WHITE."/".TF::GOLD.$maxPlayers;
+				$lines[3] = TF::DARK_GREEN.($currentPlayers ?? "-").TF::WHITE."/".TF::GOLD.($maxPlayers ?? "-");
 			}else{
 				$lines[0] = TF::DARK_RED."Offline";
 				$lines[1] = "IP: ".TF::GREEN.$ip;
