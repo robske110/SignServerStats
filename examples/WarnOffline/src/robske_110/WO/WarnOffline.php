@@ -27,7 +27,7 @@ class WarnOffline extends PluginBase{
 				return;
 			}
 		}else{
-			$this->getLogger()->critical("This plugin needs SignServerStats. And I couldn't find it :/");
+			$this->getLogger()->critical("This plugin needs SignServerStats. And I couldn't find it :/ (Also, why did PM not prevent me from loading?)");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
@@ -41,6 +41,14 @@ class WarnOffline extends PluginBase{
 		}else{
 			$this->getLogger()->critical("Unexpected error: Trying to get SignServerStats plugin instance failed!");
 			return NULL;
+		}
+	}
+	
+	public function notifyMsg(string $msg){
+		foreach($this->getServer->getPlayers() as $player){
+			if($player->hasPermission("WarnOffline.notify")){
+				$player->sendMessage($msg);
+			}
 		}
 	}
 		
@@ -62,8 +70,20 @@ class WarnOffline extends PluginBase{
 					return false;
 				}
 			break;
-			case "listWatchServers":
-				//@TODO
+			case "listWatchServers": //I personally hate the "pages" approach, MCPE and almost all terminals/ssh/rcon clients have scrollbars.
+					$sender->sendMessage("Full list of WatchServers:");
+					$watchServers = $this->warnTask->getWatchServers();
+					$onlineCnt = 0;
+					$offlineCnt = 0;
+					foreach($watchServers as $watchServer){
+						if($watchServer[2] === true){
+							$onlineCnt++;
+						}elseif($watchServer[2] === false){
+							$offlineCnt++;
+						}
+						$sender->sendMessage(TF::DARK_GRAY.$watchServer[0].TF::GRAY.":".TF::DARK_GRAY.$watchServer[1]." | ".($watchServer[2] ? TF::GREEN."ONLINE" : TF::DARK_RED."OFFLINE"));
+					}
+					$sender->sendMessage("Total: ".count($watchServers)."Online: ".$onlineCnt."Offline: ".$offlineCnt);
 				return true;
 			break;
 		}

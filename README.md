@@ -38,8 +38,8 @@ To check if the server is online simply do this, it is recommended to do this in
 ```php
 /** @var $sss robske_110\SSS\SignServerStats */
 $serverOnlineArray = $sss->getServerOnline();
-if(isset($serverOnlineArray["someip.com".'1234'])){
-	$isOnline = $serverOnlineArray["someip.com".'1234'];
+if(isset($serverOnlineArray["someip.com"."@".'1234'])){
+	$isOnline = $serverOnlineArray["someip.com"."@".'1234'];
     //isOnline is now a bool (true/false) that reflects the online state of the server (if the server is online and this says false, it probably doesn't have query enabled)
     //You can now also get additional data with getMODTs() and getPlayerData() in the same way.
 }else{

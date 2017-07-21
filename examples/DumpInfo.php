@@ -128,13 +128,13 @@ namespace robske_110\DPS{
 		private function dumpServer($hostname, $port, SignServerStats $sss): array{
 			$msgs = [];
 			$serverOnlineArray = $sss->getServerOnline();
-			if(isset($serverOnlineArray[$hostname.$port])){
+			if(isset($serverOnlineArray[$hostname."@".$port])){
 				$msgs[] = "Dump for server ".$hostname.":".$port.":";
-			    $isOnline = $serverOnlineArray[$hostname.$port];
+			    $isOnline = $serverOnlineArray[$hostname."@".$port];
 			    if($isOnline){
 		    		$msgs[] = "Status: Online";
-					$msgs[] = "MODT: ".$sss->getMODTs()[$hostname.$port].TF::RESET;
-					$playerData = $sss->getPlayerData()[$hostname.$port];
+					$msgs[] = "MODT: ".$sss->getMODTs()[$hostname."@".$port].TF::RESET;
+					$playerData = $sss->getPlayerData()[$hostname."@".$port];
 					$msgs[] = "Players: ".$playerData[0]."/".$playerData[1];
 			    }else{
 			    	$msgs[] = "Status: Offline";
