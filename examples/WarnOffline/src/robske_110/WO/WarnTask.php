@@ -4,7 +4,7 @@ namespace robske_110\WO;
 use pocketmine\scheduler\PluginTask;
 use pocketmine\utils\TextFormat as TF;
 
-class DisplayTask extends PluginTask{
+class WarnTask extends PluginTask{
 	private $plugin;
 	private $watchServers = []; //[(string) hostname, (int) port, ?bool online]
 	
@@ -31,10 +31,13 @@ class DisplayTask extends PluginTask{
 		}
 	}
 	
+	public function getWatchServers(): array{
+		return $this->watchServers;
+	}
+	
 	public function onRun(int $currentTick){
-		if(!($sss = $this->getServer()->getPluginManager()->getPlugin("SignServerStats")) instanceof SignServerStats){
-			$this->getLogger()->critical("Unexpected error: Trying to get SignServerStats plugin instance failed!");
-			return;
+		if(($sss = $this->plugin->getSSS()) === null){
+			return true;
 		}
 		$serverOnlineArray = $sss->getServerOnline();
 		foreach($this->watchServers as $index => $watchServer){
@@ -42,10 +45,10 @@ class DisplayTask extends PluginTask{
 			    if($serverOnlineArray[$index]){
 		    		$this->watchServers[$index][2] = true;
 			    }else{
-					if($this->watchServers[$index][2]){
+					if($this->watchServers[$index][2] !== false){
 						$this->plugin->notifyMsg(TF::DARK_GRAY."Server ".$watchServer[0].TF::GRAY.":".TF::DARK_GRAY.$watchServer[1]." went ".TF::DARK_RED."OFFLINE");
-						$this->watchServers[$index][2] = false;
 					}
+					$this->watchServers[$index][2] = false;
 			    }
 			}else{
 				$this->watchServers[$index][2] = null;

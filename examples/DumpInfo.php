@@ -15,10 +15,7 @@ namespace robske_110\DPS{
 
 	use robske_110\SPC\ScriptPluginCommands;
 	use robske_110\SSS\SignServerStats;
-	use pocketmine\event\Listener;
 	use pocketmine\plugin\PluginBase;
-	use pocketmine\event\server\DataPacketReceiveEvent;
-	use pocketmine\network\protocol\MovePlayerPacket;
 	use pocketmine\command\Command;
 	use pocketmine\command\CommandSender;
 	use pocketmine\utils\TextFormat as TF;
@@ -108,9 +105,7 @@ namespace robske_110\DPS{
 		}
 	
 		public function onRun(int $currentTick){
-			$sss = $this->plugin->getSSS();
-			if($sss === NULL){
-				$this->plugin->getLogger()->critical("SSS is not enabled anymore, it may have crashed.");
+			if(($sss = $this->getSSS()) === null){
 				return;
 			}
 			foreach($this->checkServers as $index => $server){
@@ -119,7 +114,7 @@ namespace robske_110\DPS{
 						$server[2]->sendMessage($msg);
 					}
 					unset($this->checkServers[$index]);
-					$sss->removeServer($server[0], $server[1]); //Warning: In future versions of SSS it could also immediately remove data, therfore breaking multiple requests at once.
+					$sss->removeServer($server[0], $server[1]); //Warning: In future versions of SSS it could also immediately remove data, therefore breaking multiple requests at once.
 				}
 			}
 			$this->checkServers = array_values($this->checkServers);
