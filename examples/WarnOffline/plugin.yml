@@ -1,35 +1,14 @@
 name: WarnOffline
 api: [3.0.0-ALPHA7]
 version: 1.0.0-InDev
-depend: SignServerStats
+depend: StatusList
 load: POSTWORLD
 main: robske_110\WO\WarnOffline
 author: robske_110
-
-commands:
- addWatchServer:
-  description: Adds a sepecified server to the watchlist
-  usage: "/addWatchServer <hostname> [port]"
-  permission: WarnOffline.manageList
-  aliases: [addWserver, addWatchS]
- remWatchServer:
-  description: Removes a sepecified server from the watchlist
-  usage: "/remWatchServer <hostname> [port]"
-  permission: WarnOffline.manageList
-  aliases: [remWserver, remWatchS]
- listWatchServers:
-   description: Shows all servers on the watchlist
-   usage: "/remWatchServer <hostname> [port]"
-   permission: WarnOffline.seeList
-   aliases: [lstWserver, lstWatchS]
 
 permissions:
  WarnOffline:
   description: "Allows to use all WarnOffline features"
   children:
    WarnOffline.notify:
-    description: "Users with this permission will be notified if a server on the watchlist goes down."
-   WarnOffline.seeList:
-    description: "Users with this permission will be able to see the watchlist."
-   WarnOffline.manageList:
-    description: "Users with this permission will be able to add/remove servers from the watchlist."
+    description: "Users with this permission will be notified if a server from the statuslist goes down."

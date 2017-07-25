@@ -1,0 +1,33 @@
+name: StatusList
+api: [3.0.0-ALPHA7]
+version: 1.0.0-InDev
+depend: SignServerStats
+load: POSTWORLD
+main: robske_110\SL\StatusList
+author: robske_110
+
+commands:
+ statuslist add:
+  description: Adds a sepecified server to the statuslist
+  usage: "/statuslist add <hostname> [port]"
+  permission: StatusList.manageList
+  aliases: [addWserver, addWatchS]
+ statuslist rem:
+  description: Removes a sepecified server from the statuslist
+  usage: "/statuslist ren <hostname> [port]"
+  permission: StatusList.manageList
+  aliases: [remWserver, remWatchS]
+ statuslist:
+   description: Shows all servers on the statuslist
+   usage: "/remWatchServer <hostname> [port]"
+   permission: StatusList.seeList
+   aliases: [lstWserver, lstWatchS]
+
+permissions:
+ StatusList:
+  description: "Allows to use all StatusList features"
+  children:
+   StatusList.seeList:
+    description: "Users with this permission will be able to see the watchlist."
+   StatusList.manageList:
+    description: "Users with this permission will be able to add/remove servers from the watchlist."

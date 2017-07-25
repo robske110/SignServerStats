@@ -23,7 +23,7 @@ namespace robske_110\DPS{
 
 	class DumpServerInfo extends PluginBase{
 		
-		const API_VERSION = "1.0.0";
+		const SSS_API_VERSION = "1.0.0";
 		
 		/** @var DisplayTask */
 		private $displayTask;
@@ -41,8 +41,8 @@ namespace robske_110\DPS{
 		
 		public function onEnable(){
 			if(($sss = $this->getSSS()) !== NULL){
-				if(!$sss->isCompatible(self::API_VERSION)){
-					$newOld = version_compare(self::API_VERSION, SignServerStats::API_VERSION, ">") ? "old" : "new";
+				if(!$sss->isCompatible(self::SSS_API_VERSION)){
+					$newOld = version_compare(self::SSS_API_VERSION, SignServerStats::SSS_API_VERSION, ">") ? "old" : "new";
 					$this->getLogger()->critical("Your version of SignServerStats is too ".$newOld." for this plugin.");
 					$this->getServer()->getPluginManager()->disablePlugin($this);
 					return;
