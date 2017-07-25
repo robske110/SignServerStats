@@ -1,5 +1,5 @@
 # SignServerStats
-A PocketMine plugin which can display player count and most from any server with query enabled.
+A PocketMine plugin which can display player count and MODT on a sign from any server with query enabled.
 
 ## Info:
 ### Usage:
