@@ -13,36 +13,18 @@ class WarnTask extends PluginTask{
 		$this->plugin = $plugin;
 	}
 	
-	public function addWatchServer(string $hostname, int $port): bool{
-		if(!isset($this->watchServers[$hostname."@".$port])){
-			$this->watchServers[$hostname."@".$port] = [$hostname, $port, null];
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	public function remWatchServer(string $hostname, int $port): bool{
-		if(isset($this->watchServers[$hostname."@".$port])){
-			unset($this->watchServers[$hostname."@".$port]);
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	public function getWatchServers(): array{
-		return $this->watchServers;
+	public function getStatusListServers(): array{
+		return $this->plugin->getSL()->getStatusGetTask()->getWatchServers();
 	}
 	
 	public function onRun(int $currentTick){
 		if(($sss = $this->plugin->getSSS()) === null){
 			return true;
 		}
-		$serverOnlineArray = $sss->getServerOnline();
+		$statusListServers = $this->getStatusListServers();
 		foreach($this->watchServers as $index => $watchServer){
-			if(isset($serverOnlineArray[$index])){
-			    if($serverOnlineArray[$index]){
+			if(isset($statusListServers[$index])){
+			    if($statusListServers[$index]){
 		    		$this->watchServers[$index][2] = true;
 			    }else{
 					if($this->watchServers[$index][2] !== false){
@@ -51,7 +33,7 @@ class WarnTask extends PluginTask{
 					$this->watchServers[$index][2] = false;
 			    }
 			}else{
-				$this->watchServers[$index][2] = null;
+				unset($this->watchServers[$index]);
 			}
 		}
 	}

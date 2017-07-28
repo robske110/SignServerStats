@@ -12,8 +12,8 @@ class StatusList extends PluginBase{
 		
 	const SSS_API_VERSION = "1.0.0";
 		
-	/** @var WarnTask */
-	private $warnTask;
+	/** @var StatusGetTask */
+	private $statusGetTask;
 	
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
@@ -29,12 +29,12 @@ class StatusList extends PluginBase{
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
-		$this->warnTask = new WarnTask($this);
-		$this->db = new Config($this->getDataFolder()."WarnOfflineDB.yml", Config::YAML, []); //TODO:betterDB
-		foreach($this->db->getAll() as $warnOfflineServer){
-			$this->addWatchServer($warnOfflineServer[0], $warnOfflineServer[1], $sss, false);
+		$this->statusGetTask = new StatusGetTask($this);
+		$this->db = new Config($this->getDataFolder()."StatusListDB.yml", Config::YAML, []); //TODO:betterDB
+		foreach($this->db->getAll() as $statusListServer){
+			$this->addStatusServer($statusListServer[0], $statusListServer[1], $sss, false);
 		}
-		$this->getServer()->getScheduler()->scheduleRepeatingTask($this->warnTask, 20);
+		$this->getServer()->getScheduler()->scheduleRepeatingTask($this->statusGetTask, 20);
 	}
 		
 	public function getSSS(){
@@ -46,8 +46,12 @@ class StatusList extends PluginBase{
 		}
 	}
 		
-	public function addWatchServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
-		if($this->warnTask->addWatchServer($hostname, $port)){
+	public function getStatusGetTask(): StatusGetTask{
+		return $this->statusGetTask;
+	}
+	
+	public function addStatusServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
+		if($this->statusGetTask->addStatusServer($hostname, $port)){
 			$sss->addServer($hostname, $port);
 			if($save){
 				$listServers = $this->db->getAll();
@@ -61,8 +65,8 @@ class StatusList extends PluginBase{
 		}
 	}
 	
-	public function remWatchServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
-		if($this->warnTask->remWatchServer($hostname, $port)){
+	public function remStatusServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
+		if($this->statusGetTask->remStatusServer($hostname, $port)){
 			$sss->removeServer($hostname, $port);
 			if($save){
 				$listServers = $this->db->getAll();
@@ -100,7 +104,7 @@ class StatusList extends PluginBase{
 			break;
 			case "statuslist": //I personally hate the "pages" approach, MCPE and almost all terminals/ssh/rcon clients have scrollbars.
 					$sender->sendMessage(TF::GREEN."Full list of servers:");
-					$listServers = $this->warnTask->getWatchServers();
+					$listServers = $this->statusGetTask->getStatusServers();
 					$onlineCnt = 0;
 					$offlineCnt = 0;
 					foreach($listServers as $listServer){
@@ -120,7 +124,7 @@ class StatusList extends PluginBase{
 		}
 		switch($command->getName()){
 			case "statuslist add":
-				if($this->addWatchServer($hostname, $port, $sss)){
+				if($this->addStatusServer($hostname, $port, $sss)){
 					$sender->sendMessage(TF::GREEN."Successfully added the server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::GREEN." to the statuslist.");
 				}else{
 					$sender->sendMessage(TF::DARK_RED."The server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::DARK_RED." is already on the statuslist!");
@@ -128,7 +132,7 @@ class StatusList extends PluginBase{
 				return true;
 			break;
 			case "statuslist rem":
-				if($this->remWatchServer($hostname, $port, $sss)){
+				if($this->remStatusServer($hostname, $port, $sss)){
 					$sender->sendMessage(TF::GREEN."Successfully removed the server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::GREEN." from the statuslist.");
 				}else{
 					$sender->sendMessage(TF::DARK_RED."The server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::DARK_RED." is not on the statuslist!");

@@ -4,7 +4,7 @@ namespace robske_110\WO;
 use pocketmine\scheduler\PluginTask;
 use pocketmine\utils\TextFormat as TF;
 
-class WarnTask extends PluginTask{
+class StatusGetTask extends PluginTask{
 	private $plugin;
 	private $listServers = []; //[(string) hostname, (int) port, ?bool online]
 	
@@ -42,14 +42,7 @@ class WarnTask extends PluginTask{
 		$serverOnlineArray = $sss->getServerOnline();
 		foreach($this->listServers as $index => $listServer){
 			if(isset($serverOnlineArray[$index])){
-			    if($serverOnlineArray[$index]){
-		    		$this->listServers[$index][2] = true;
-			    }else{
-					if($this->listServers[$index][2] !== false){
-						$this->plugin->notifyMsg(TF::DARK_GRAY."Server ".$listServer[0].TF::GRAY.":".TF::DARK_GRAY.$listServer[1]." went ".TF::DARK_RED."OFFLINE");
-					}
-					$this->listServers[$index][2] = false;
-			    }
+		    	$this->listServers[$index][2] = $serverOnlineArray[$index];
 			}else{
 				$this->listServers[$index][2] = null;
 			}
