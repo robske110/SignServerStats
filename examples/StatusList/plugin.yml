@@ -1,6 +1,6 @@
 name: StatusList
 api: [3.0.0-ALPHA7]
-version: 1.0.0-InDev
+version: 1.0.0-InDev-beta1
 depend: SignServerStats
 load: POSTWORLD
 main: robske_110\SL\StatusList
@@ -21,7 +21,7 @@ commands:
    description: Shows all servers on the statuslist
    usage: "/remWatchServer <hostname> [port]"
    permission: StatusList.seeList
-   aliases: [lstSL, showSL, listStatusList, showStatusList]
+   aliases: [lstSL, showSL, listStatusList, showStatusList, statuslist list]
 
 permissions:
  StatusList:

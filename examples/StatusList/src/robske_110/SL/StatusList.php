@@ -37,7 +37,7 @@ class StatusList extends PluginBase{
 		$this->getServer()->getScheduler()->scheduleRepeatingTask($this->statusGetTask, 20);
 	}
 		
-	public function getSSS(){
+	public function getSSS(){ //:?SignServerStats
 		if(($sss = $this->getServer()->getPluginManager()->getPlugin("SignServerStats")) instanceof SignServerStats){
 			return $sss;
 		}else{

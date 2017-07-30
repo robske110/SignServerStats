@@ -26,7 +26,7 @@ class WarnOffline extends PluginBase{
 		$this->getServer()->getScheduler()->scheduleRepeatingTask($this->warnTask, 20);
 	}
 		
-	public function getSL(){
+	public function getSL(){ //:?StatusList
 		if(($sss = $this->getServer()->getPluginManager()->getPlugin("StatusList")) instanceof StatusList){
 			return $sss;
 		}else{
@@ -41,5 +41,6 @@ class WarnOffline extends PluginBase{
 				$player->sendMessage($msg);
 			}
 		}
+		$this->getLogger()->warning($msg);
 	}
 }
