@@ -1,5 +1,5 @@
 <?php
-namespace robske_110\WO;
+namespace robske_110\SL;
 
 use robske_110\SSS\SignServerStats;
 use pocketmine\plugin\PluginBase;
@@ -102,8 +102,8 @@ class StatusList extends PluginBase{
 					return true;
 				}
 			break;
-			case "statuslist": //I personally hate the "pages" approach, MCPE and almost all terminals/ssh/rcon clients have scrollbars.
-					$sender->sendMessage(TF::GREEN."Full list of servers:");
+			case "statuslist show": //I personally hate the "pages" approach, MCPE and almost all terminals/ssh/rcon clients have scrollbars.
+					$sender->sendMessage(TF::GREEN."All StatusList servers:");
 					$listServers = $this->statusGetTask->getStatusServers();
 					$onlineCnt = 0;
 					$offlineCnt = 0;

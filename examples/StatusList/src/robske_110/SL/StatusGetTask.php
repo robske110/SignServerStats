@@ -1,5 +1,5 @@
 <?php
-namespace robske_110\WO;
+namespace robske_110\SL;
 
 use pocketmine\scheduler\PluginTask;
 use pocketmine\utils\TextFormat as TF;
@@ -8,12 +8,12 @@ class StatusGetTask extends PluginTask{
 	private $plugin;
 	private $listServers = []; //[(string) hostname, (int) port, ?bool online]
 	
-	public function __construct(WarnOffline $plugin){
+	public function __construct(StatusList $plugin){
 		parent::__construct($plugin);
 		$this->plugin = $plugin;
 	}
 	
-	public function addWatchServer(string $hostname, int $port): bool{
+	public function addStatusServer(string $hostname, int $port): bool{
 		if(!isset($this->listServers[$hostname."@".$port])){
 			$this->listServers[$hostname."@".$port] = [$hostname, $port, null];
 			return true;
@@ -22,7 +22,7 @@ class StatusGetTask extends PluginTask{
 		}
 	}
 	
-	public function remWatchServer(string $hostname, int $port): bool{
+	public function remStatusServer(string $hostname, int $port): bool{
 		if(isset($this->listServers[$hostname."@".$port])){
 			unset($this->listServers[$hostname."@".$port]);
 			return true;
@@ -31,7 +31,7 @@ class StatusGetTask extends PluginTask{
 		}
 	}
 	
-	public function getWatchServers(): array{
+	public function getStatusServers(): array{
 		return $this->listServers;
 	}
 	

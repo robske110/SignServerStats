@@ -11,17 +11,17 @@ commands:
   description: Adds a sepecified server to the statuslist
   usage: "/statuslist add <hostname> [port]"
   permission: StatusList.manageList
-  aliases: [addWserver, addWatchS]
+  aliases: [addSserver, addStatusS]
  statuslist rem:
   description: Removes a sepecified server from the statuslist
   usage: "/statuslist ren <hostname> [port]"
   permission: StatusList.manageList
-  aliases: [remWserver, remWatchS]
- statuslist:
+  aliases: [remSserver, remStatusS, statuslist remove]
+ statuslist show:
    description: Shows all servers on the statuslist
    usage: "/remWatchServer <hostname> [port]"
    permission: StatusList.seeList
-   aliases: [lstWserver, lstWatchS]
+   aliases: [lstSL, showSL, listStatusList, showStatusList]
 
 permissions:
  StatusList:
