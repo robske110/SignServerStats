@@ -12,24 +12,30 @@ use pocketmine\Server;
 use pocketmine\scheduler\AsyncTask;
 
 class SSSAsyncTask extends AsyncTask{
+  /** @var array */
   private $doCheckServer;
   
+  /* @var bool */
   private $debug;
+  /** @var $startTick */
   private $startTick;
+  /** @var float */
+  private $timeout;
   
-  public function __construct(array $doCheckServers, bool $debug, int $startTick){
+  public function __construct(array $doCheckServers, bool $debug, float $timeout, int $startTick){
 	  $this->doCheckServer = $doCheckServers;
 	  $this->debug = $debug;
+	  $this->timeout = $timeout;
 	  $this->startTick = $startTick;
   }
   
-  private function doQuery(string $ip, int $port): array{
+  private function doQuery(string $ip, int $port, array $timeout): array{
   	  if($this->debug){
   	  	echo("doQuery:\n");
   	  }
       $sock = @fsockopen("udp://".$ip,$port);
       if(!$sock){return [-1, NULL];}
-      socket_set_timeout($sock, 0, 500000);
+      socket_set_timeout($sock, $timeout[0], $timeout[1]);
       if(!@fwrite($sock, "\xFE\xFD\x09\x10\x20\x30\x40\xFF\xFF\xFF\x01")){return [0, NULL];}
       $challenge = fread($sock, 1400);
       if(!$challenge){return [0, NULL];}
@@ -40,18 +46,18 @@ class SSSAsyncTask extends AsyncTask{
           ($challenge >> 16),
           ($challenge >> 8),
           ($challenge >> 0)
-          );
+      );
       if(!@fwrite($sock, $query)){return [0, NULL];}
       $response = array();
       for($x = 0; $x < 2; $x++){
-          $response[] = @fread($sock,2048);
+          $response[] = @fread($sock, 2048);
       }
 	  if($this->debug){
 	      var_dump($response);
       }
       $response = implode($response);
-      $response = substr($response,16);
-      $response = explode("\0",$response);
+      $response = substr($response, 16);
+      $response = explode("\0", $response);
 	  if($this->debug){
 	  	  var_dump($response);
 	  }
@@ -77,13 +83,14 @@ class SSSAsyncTask extends AsyncTask{
 		  echo("DoCheckServer:\n");
 		  var_dump($this->doCheckServer);
   	  }
+	  $timeout = explode(".", (string) $this->timeout);
 	  foreach($this->doCheckServer as $server){
 		  $doCheck = $server[1];
 		  if($doCheck){
 			  $adressArray = $server[0];
 			  $ip = $adressArray[0];
 			  $port = $adressArray[1];
-			  $return = $this->doQuery($ip, $port);
+			  $return = $this->doQuery($ip, $port, $timeout);
 			  $returnState = $return[0];
 			  $queryResult = $return[1];
 			  $serverData = [];

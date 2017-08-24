@@ -35,12 +35,21 @@ class SignServerStats extends PluginBase{
 	/** @var Server */
 	private $server;
 
+	/** @var float */
+	private $timeout;
+	/** @var array */
 	private $doCheckServers = [];
+	/** @var bool */
 	private $debug = false;
+	/** @var bool */
 	private $asyncTaskIsRunning = false;
+	/** @var array */
 	private $doRefreshSigns = [];
+	/** @var array */
 	private $asyncTaskMODTs = [];
+	/** @var array */
 	private $asyncTaskPlayers = [];
+	/** @var array */
 	private $asyncTaskIsOnline = [];
 	
 	const API_VERSION = "1.0.0";
@@ -50,11 +59,12 @@ class SignServerStats extends PluginBase{
 		$this->server = $this->getServer();
 		$this->db = new Config($this->getDataFolder() . "SignServerStatsDB.yml", Config::YAML, []); //TODO:betterDB
 		$this->signServerStatsCfg = new Config($this->getDataFolder() . "SSSconfig.yml", Config::YAML, []);
-		if($this->signServerStatsCfg->get("ConfigVersion") != 2){
-			$this->signServerStatsCfg->set('SSSAsyncTaskCall', 200);
+		if($this->signServerStatsCfg->get("ConfigVersion") != 3){
+			$this->signServerStatsCfg->set('async-task-call-ticks', 200);
 			$this->signServerStatsCfg->set('always-start-async-task', false);
+			$this->signServerStatsCfg->set('server-query-timeout-sec', 2.5);
 			$this->signServerStatsCfg->set('debug', false);
-			$this->signServerStatsCfg->set('ConfigVersion', 2);
+			$this->signServerStatsCfg->set('ConfigVersion', 3);
 		}
 		$this->signServerStatsCfg->save();
 		if($this->signServerStatsCfg->get('debug')){
@@ -64,7 +74,22 @@ class SignServerStats extends PluginBase{
 		$this->server->getPluginManager()->registerEvents($this->listener, $this);
 		$this->doRefreshSigns = $this->db->getAll();
 		$this->recalcdRSvar();
-		$this->server->getScheduler()->scheduleRepeatingTask(new SSSAsyncTaskCaller($this), $this->signServerStatsCfg->get("SSSAsyncTaskCall"));
+		$this->timeout = $this->signServerStatsCfg->get('server-query-timeout-sec');
+		$this->server->getScheduler()->scheduleRepeatingTask(
+			new SSSAsyncTaskCaller($this), $this->signServerStatsCfg->get("async-task-call-ticks")
+		);
+	}
+	
+	public function isCompatible(string $apiVersion): bool{
+		$extensionApiVersion = explode(".", $apiVersion);
+		$myApiVersion = explode(".", self::API_VERSION);
+		if($extensionApiVersion[0] !== $myApiVersion[0]){
+			return false;
+		}
+		if($extensionApiVersion[1] > $myApiVersion[1]){
+			return false;
+		}
+		return true;
 	}
 	
 	public function getServerOnline(): array{
@@ -85,24 +110,6 @@ class SignServerStats extends PluginBase{
 	
 	public function isAdmin(Player $player): bool{
 		return $player->hasPermission("SSS.signs");
-	}
-	
-	public function doSignRefresh(){
-		foreach($this->doRefreshSigns as $signData){
-			$pos = $signData[0];
-			$adress = $signData[1];
-			if($this->server->loadLevel($pos[3])){
-				$signTile = $this->server->getLevelByName($pos[3])->getTile(new Vector3($pos[0], $pos[1], $pos[2]));
-				if($signTile instanceof Sign){
-					$lines = $this->calcSign($adress);
-					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
-				}else{
-					$this->server->broadcast("r001_SIGN_NOT_FOUND_AT(".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
-				}
-			}else{
-				$this->server->broadcast("r002_COULD_NOT_FIND_LEVEL_FOR_SIGN_AT(".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
-			}
-		}
 	}
 	
 	public function doesSignExist(Vector3 $pos, string $levelName, int &$index = 0): bool{
@@ -166,7 +173,7 @@ class SignServerStats extends PluginBase{
 	  */
 	public function startAsyncTask($currTick){
 		$this->asyncTaskIsRunning = true;
-		$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $currTick));
+		$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $this->timeout, $currTick));
 	}
 	
 	/**
@@ -201,20 +208,29 @@ class SignServerStats extends PluginBase{
 	/**
 	  * @internal
 	  */
-	public function isAllowedToStartAsyncTask(): bool{
-		return $this->signServerStatsCfg->get('always-start-async-task') ? true : !$this->asyncTaskIsRunning;
+	public function doSignRefresh(){
+		foreach($this->doRefreshSigns as $signData){
+			$pos = $signData[0];
+			$adress = $signData[1];
+			if($this->server->loadLevel($pos[3])){
+				$signTile = $this->server->getLevelByName($pos[3])->getTile(new Vector3($pos[0], $pos[1], $pos[2]));
+				if($signTile instanceof Sign){
+					$lines = $this->calcSign($adress);
+					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
+				}else{
+					$this->server->broadcast("r001_SIGN_NOT_FOUND_AT(".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+				}
+			}else{
+				$this->server->broadcast("r002_COULD_NOT_FIND_LEVEL_FOR_SIGN_AT(".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+			}
+		}
 	}
 	
-	public function isCompatible(string $apiVersion): bool{
-		$extensionApiVersion = explode(".", $apiVersion);
-		$myApiVersion = explode(".", self::API_VERSION);
-		if($extensionApiVersion[0] !== $myApiVersion[0]){
-			return false;
-		}
-		if($extensionApiVersion[1] > $myApiVersion[1]){
-			return false;
-		}
-		return true;
+	/**
+	  * @internal
+	  */
+	public function isAllowedToStartAsyncTask(): bool{
+		return $this->signServerStatsCfg->get('always-start-async-task') ? true : !$this->asyncTaskIsRunning;
 	}
 	
 	/**

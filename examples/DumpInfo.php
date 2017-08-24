@@ -3,7 +3,7 @@
 /**
  * @name DumpServerInfo
  * @main robske_110\DPS\DumpServerInfo
- * @version 1.0.0
+ * @version 1.0.0-beta1
  * @api 3.0.0-ALPHA7
  * @description Dumps query info of a Server using SignServerStats
  * @author robske_110
@@ -105,7 +105,7 @@ namespace robske_110\DPS{
 		}
 	
 		public function onRun(int $currentTick){
-			if(($sss = $this->getSSS()) === null){
+			if(($sss = $this->plugin->getSSS()) === null){
 				return;
 			}
 			foreach($this->checkServers as $index => $server){
@@ -114,7 +114,7 @@ namespace robske_110\DPS{
 						$server[2]->sendMessage($msg);
 					}
 					unset($this->checkServers[$index]);
-					$sss->removeServer($server[0], $server[1]); //Warning: In future versions of SSS it could also immediately remove data, therefore breaking multiple requests at once.
+					$sss->removeServer($server[0], $server[1]); //Warning: In future versions of SSS this could also immediately remove data, therefore breaking multiple requests at once.
 				}
 			}
 			$this->checkServers = array_values($this->checkServers);

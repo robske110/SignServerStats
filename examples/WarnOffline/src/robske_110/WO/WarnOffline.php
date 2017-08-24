@@ -31,7 +31,7 @@ class WarnOffline extends PluginBase{
 			return $sss;
 		}else{
 			$this->getLogger()->critical("Unexpected error: Trying to get SignServerStats plugin instance failed!");
-			return NULL;
+			return null;
 		}
 	}
 	
