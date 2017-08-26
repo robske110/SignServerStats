@@ -35,12 +35,16 @@ class WarnOffline extends PluginBase{
 		}
 	}
 	
-	public function notifyMsg(string $msg){
+	public function notifyMsg(string $msg, bool $warn = true){
 		foreach($this->getServer()->getOnlinePlayers() as $player){
 			if($player->hasPermission("WarnOffline.notify")){
-				$player->sendMessage($msg);
+				$player->sendMessage(TF::WHITE."[WarnOffline] ".$msg);
 			}
 		}
-		$this->getLogger()->warning($msg);
+		if($warn){
+			$this->getLogger()->warning($msg);
+		}else{
+			$this->getLogger()->notice($msg);
+		}
 	}
 }
