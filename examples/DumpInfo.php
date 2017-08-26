@@ -143,11 +143,10 @@ namespace robske_110\DPS{
 namespace robske_110\SPC{
 	use pocketmine\command\PluginCommand;
 	use pocketmine\Plugin\Plugin;
-	use robske_110\Utils\Utils;
 	
 	/**
 	  * @author robske_110
-	  * @version 0.1.2-php7 
+	  * @version 0.1.2-php7-noutils
 	  */
 	abstract class ScriptPluginCommands{
 		private static $plugins;
@@ -159,7 +158,7 @@ namespace robske_110\SPC{
 		
 		public static function addCommand(int $id, array $data){
 			if(!isset(self::$plugins[$id])){
-				Utils::critical("addCommand() has been called with an unkown ID!");
+				echo("addCommand() has been called with an unkown ID!");
 			}
 			$cmd = new PluginCommand($data["name"], self::$plugins[$id][0]);
 			if(isset($data["description"])){
@@ -183,7 +182,7 @@ namespace robske_110\SPC{
 		
 		public static function getCommands(int $id) : array {
 			if(!isset(self::$plugins[$id])){
-				Utils::critical("getCommands() has been called with an unkown ID!");
+				echo("getCommands() has been called with an unkown ID!");
 			}
 			return self::$plugins[$id][1];
 		}
