@@ -43,6 +43,8 @@ class SignServerStats extends PluginBase{
 	private $debug = false;
 	/** @var bool */
 	private $asyncTaskIsRunning = false;
+	/** @var int */
+	private $lastRefreshTick = -1;
 	/** @var array */
 	private $doRefreshSigns = [];
 	/** @var array */
@@ -90,6 +92,10 @@ class SignServerStats extends PluginBase{
 			return false;
 		}
 		return true;
+	}
+	
+	public function getLastRefreshTick(): int{
+		return $this->lastRefreshTick;
 	}
 	
 	public function getServerOnline(): array{
@@ -181,6 +187,7 @@ class SignServerStats extends PluginBase{
 	  */
 	public function asyncTaskCallBack($data, $scheduleTime){
 		$this->asyncTaskIsRunning = false;
+		$this->lastRefreshTick = $scheduleTime;
 		if(!is_array($data)){
 			return;
 		}

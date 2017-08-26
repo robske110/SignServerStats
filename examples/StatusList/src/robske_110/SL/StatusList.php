@@ -118,7 +118,13 @@ class StatusList extends PluginBase{
 							($listServer[2] === true ? TF::GREEN."ONLINE" : ($listServer[2] === false ? TF::DARK_RED."OFFLINE" : TF::GRAY."LOADING"))
 						);
 					}
-					$sender->sendMessage(TF::GREEN."Total: ".count($listServers)." Online: ".$onlineCnt." Offline: ".$offlineCnt);
+					
+					if(($statusServerRefreshTick = $this->statusGetTask->getStatusServerRefreshTick()) === -1){
+						$refreshText = TF::GRAY."NEVER";
+					}else{
+						$refreshText = round(($this->getServer()->getTick() - $statusServerRefreshTick) / 20, 1)."s ago";
+					}
+					$sender->sendMessage(TF::GREEN."Total: ".count($listServers)." Online: ".$onlineCnt." Offline: ".$offlineCnt." Last Refresh: ".$refreshText);
 				return true;
 			break;
 		}
