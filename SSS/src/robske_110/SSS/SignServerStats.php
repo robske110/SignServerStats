@@ -172,7 +172,7 @@ class SignServerStats extends PluginBase{
 	public function removeServer(string $ip, int $port): bool{
 		if(isset($this->doCheckServers[$ip."@".$port])){
 			unset($this->doCheckServers[$ip."@".$port]);
-			$this->recalcdRSvar(); //Do not allow removing a server for a sign.
+			$this->recalcdRSvar(); //Do not allow removing servers if still required for a sign.
 			return true;
 		}
 		return false;
@@ -229,10 +229,10 @@ class SignServerStats extends PluginBase{
 					$lines = $this->calcSign($adress);
 					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
 				}else{
-					$this->server->broadcast("r001_SIGN_NOT_FOUND_AT(".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+					$this->server->broadcast(TF::RED."[SSS] r001 Could not find the sign at (".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
 				}
 			}else{
-				$this->server->broadcast("r002_COULD_NOT_FIND_LEVEL_FOR_SIGN_AT(".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+				$this->server->broadcast(TF::RED."[SSS] r002 Could not find the level for the sign at (".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
 			}
 		}
 	}

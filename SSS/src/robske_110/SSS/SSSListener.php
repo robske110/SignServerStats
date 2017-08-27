@@ -14,6 +14,8 @@ use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\tile\Sign;
 use pocketmine\Server;
+use pocketmine\Player;
+use pocketmine\utils\TextFormat as TF;
 
 class SSSListener implements Listener{
 	private $main;
@@ -24,19 +26,24 @@ class SSSListener implements Listener{
 		$this->server = $main->getServer();
 	}
 	
+	private function sendSSSmessage(Player $player, string $msg){
+		$player->sendMessage(TF::GRAY."[SSS] ".$msg);
+	}
+	
 	public function onBreak(BlockBreakEvent $event){ 
 		$block = $event->getBlock();
-		$levelName = $event->getPlayer()->getLevel()->getFolderName();
+		$player = $event->getPlayer();
+		$levelName = $player->getLevel()->getFolderName();
 		if($this->main->doesSignExist($block, $levelName)){
-			if($this->main->isAdmin($event->getPlayer())){ 
+			if($this->main->isAdmin($player)){ 
 				if($this->main->removeSign($block, $levelName)){
-					$event->getPlayer()->sendMessage("[SSS] Sign sucessfully deleted!");
+					$this->sendSSSmessage($player, TF::GREEN."Sign sucessfully deleted!");
 				}else{
-					$this->server->broadcast("CRITICAL/r005_FAIL::removeSign [Additional Info: removeSign() has returned false]", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+					$this->server->broadcast(TF::RED."CRITICAL/r003: removeSign() returned false. Has the sign already been removed?", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
 				}
 				$this->main->recalcdRSvar();
 			}else{
-				$event->getPlayer()->sendMessage("[SSS] No, you are not allowed to do that!");
+				$this->sendSSSmessage($player, TF::RED."You are not allowed to do that!");
 				$event->setCancelled();
 			}
 		}
@@ -44,14 +51,15 @@ class SSSListener implements Listener{
 	
 	public function onSignChange(SignChangeEvent $event){
 		$block = $event->getBlock();
-		$sign = $event->getPlayer()->getLevel()->getTile($block);
+		$player = $event->getPlayer();
+		$sign = $player->getLevel()->getTile($block);
 		if(!($sign instanceof Sign)){
 			return true;
 		}
 		$sign = $event->getLines();
 		if($sign[0]=='[SSS]'){
-			if(!$this->main->isAdmin($event->getPlayer())){
-				$event->getPlayer()->sendMessage("[SSS] No, you are not allowed to do that!");
+			if(!$this->main->isAdmin($player)){
+				$this->sendSSSmessage($player, TF::RED."You are not allowed to do that!");
 				$event->setLine(0,"[BLOCKED]");
 				return false;
 			}
@@ -62,30 +70,39 @@ class SSSListener implements Listener{
 	public function onSignTap(PlayerInteractEvent $event){
 		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK){
 			$block = $event->getBlock();
-			$signTile = $event->getPlayer()->getLevel()->getTile($block);
+			$player = $event->getPlayer();
+			$signTile = $player->getLevel()->getTile($block);
 			if($signTile instanceof Sign){
 				$sign = $signTile->getText();
 				if($sign[0]=='[SSS]'){
-					if($this->main->isAdmin($event->getPlayer())){
+					if($this->main->isAdmin($player)){
 						if(!empty($sign[1])){
 							if(!empty($sign[2])){
-								$levelName = $block->getLevel()->getFolderName();
-								$this->main->addSign($sign[1], $sign[2], $block, $levelName);
-								$this->main->recalcdRSvar();
-								$signTile->setText(...$this->main->calcSign([$sign[1], $sign[2]]));
-								$event->getPlayer()->sendMessage("[SSS] The ServerStats Sign for the IP '".$sign[1]."' Port '".$sign[2]."' has been set up correctly!");
+								if(is_numeric($sign[2])){
+									$levelName = $block->getLevel()->getFolderName();
+									$this->main->addSign($sign[1], $sign[2], $block, $levelName);
+									$this->main->recalcdRSvar();
+									$signTile->setText(...$this->main->calcSign([$sign[1], $sign[2]]));
+									$this->sendSSSmessage(
+										$player,
+										TF::GREEN."The ServerStats Sign for the Server ".
+										TF::DARK_GRAY.$sign[1].TF::GRAY.":".TF::DARK_GRAY.$sign[2].TF::GREEN.
+										" has been set up correctly!"
+									);
+								}else{
+									$this->sendSSSmessage($player, TF::RED."Port must be a number! (Line 3)");
+									$signTile->setLine(0,"[BROKEN]");
+								}
 							}else{
-								$event->getPlayer()->sendMessage("[SSS] PORT_MISSING (LINE3)");
-								$this->server->broadcast("r003_PORT_MISSING", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+								$this->sendSSSmessage($player, TF::RED."Port is missing! (Line 3)");
 								$signTile->setLine(0,"[BROKEN]");
 							}
 						}else{
-							$event->getPlayer()->sendMessage("[SSS] IP_MISSING (LINE2)");
-							$this->server->broadcast("r004_IP_MISSING", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+							$this->sendSSSmessage($player, TF::RED."[SSS] IP is missing. (Line 2)");
 							$signTile->setLine(0,"[BROKEN]");
 						}
 					}else{
-						$event->getPlayer()->sendMessage("[SSS] No, you are not allowed to do that!");
+						$this->sendSSSmessage($player, TF::RED."You are not allowed to do that!");
 					}
 				}
 			}
