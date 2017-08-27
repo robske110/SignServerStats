@@ -19,7 +19,7 @@ before_script:
  - mkdir plugins
  - cd plugins
  - wget -O DevTools.phar https://poggit.pmmp.io/r/10317/PocketMine-DevTools.phar
- - cd /home/travis/build/robske110/SSS/
+ - cd /home/travis/build/robske110/SignServerStats/
  - cp -rf Travis.php PocketMine-MP/
  - cd PocketMine-MP
 
