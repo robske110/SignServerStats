@@ -13,8 +13,10 @@ class StatusList extends PluginBase{
 	const SSS_API_VERSION = "1.0.0";
 	const API_VERSION = "1.0.0";
 	
-	/** @var StatusGetTask */
+	/** @var StatusListManager */
 	private $statusListManager;
+	/** @var array */
+	private $ownedServer;
 	
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
@@ -64,7 +66,9 @@ class StatusList extends PluginBase{
 	
 	public function addStatusServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
 		if($this->statusListManager->addStatusServer($hostname, $port)){
-			$sss->addServer($hostname, $port);
+			if($sss->addServer($hostname, $port)){
+				$this->ownedServers[$hostname."@".$port] = null;
+			}
 			if($save){
 				$listServers = $this->db->getAll();
 				$listServers[$hostname."@".$port] = [$hostname, $port];
@@ -79,7 +83,10 @@ class StatusList extends PluginBase{
 	
 	public function remStatusServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
 		if($this->statusListManager->remStatusServer($hostname, $port)){
-			$sss->removeServer($hostname, $port);
+			if(isset($this->ownedServers[$hostname."@".$port])){
+				$sss->removeServer($hostname, $port);
+				unset($this->ownedServers[$hostname."@".$port]);
+			}
 			if($save){
 				$listServers = $this->db->getAll();
 				unset($listServers[$hostname."@".$port]);

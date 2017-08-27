@@ -42,7 +42,7 @@ namespace robske_110\DPS{
 		public function onEnable(){
 			if(($sss = $this->getSSS()) !== NULL){
 				if(!$sss->isCompatible(self::SSS_API_VERSION)){
-					$newOld = version_compare(self::SSS_API_VERSION, SignServerStats::SSS_API_VERSION, ">") ? "old" : "new";
+					$newOld = version_compare(self::SSS_API_VERSION, SignServerStats::API_VERSION, ">") ? "old" : "new";
 					$this->getLogger()->critical("Your version of SignServerStats is too ".$newOld." for this plugin.");
 					$this->getServer()->getPluginManager()->disablePlugin($this);
 					return;
@@ -78,11 +78,11 @@ namespace robske_110\DPS{
 						}
 					}
 					if(($sss = $this->getSSS()) !== NULL){
-						$sss->addServer($hostname, $port);
-						$this->displayTask->addServer($hostname, $port, $sender);
-						$sender->sendMessage("Getting info for the server ".$hostname.":".$port."...");
+						$owned = $sss->addServer($hostname, $port);
+						$this->displayTask->addServer($hostname, $port, $owned, $sender);
+						$sender->sendMessage(TF::GREEN."Getting info for the server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::GREEN."...");
 					}else{
-						$sender->sendMessage("SSS is not enabled anymore, it might have crashed.");
+						$sender->sendMessage(TF::RED."SSS is not enabled anymore, it might have crashed.");
 					}
 					return true;
 				}
@@ -100,8 +100,8 @@ namespace robske_110\DPS{
 	        $this->plugin = $plugin;
 	    }
 	
-		public function addServer(string $hostname, int $port, CommandSender $sender){
-			$this->checkServers[] = [$hostname, $port, $sender];
+		public function addServer(string $hostname, int $port, $owned, CommandSender $sender){
+			$this->checkServers[] = [$hostname, $port, $owned, $sender];
 		}
 	
 		public function onRun(int $currentTick){
@@ -111,10 +111,12 @@ namespace robske_110\DPS{
 			foreach($this->checkServers as $index => $server){
 				if(($msgs = $this->dumpServer($server[0], $server[1], $sss)) !== []){
 					foreach($msgs as $msg){
-						$server[2]->sendMessage($msg);
+						$server[3]->sendMessage($msg);
 					}
 					unset($this->checkServers[$index]);
-					$sss->removeServer($server[0], $server[1]); //Warning: In future versions of SSS this could also immediately remove data, therefore breaking multiple requests at once.
+					if($server[2]){
+						$sss->removeServer($server[0], $server[1]); //Warning: In future versions of SSS this could also immediately remove data, therefore breaking multiple requests at once.
+					}
 				}
 			}
 			$this->checkServers = array_values($this->checkServers);
@@ -124,15 +126,15 @@ namespace robske_110\DPS{
 			$msgs = [];
 			$serverOnlineArray = $sss->getServerOnline();
 			if(isset($serverOnlineArray[$hostname."@".$port])){
-				$msgs[] = "Dump for server ".$hostname.":".$port.":";
+				$msgs[] = TF::GREEN."Dump for server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::GREEN.":";
 			    $isOnline = $serverOnlineArray[$hostname."@".$port];
 			    if($isOnline){
-		    		$msgs[] = "Status: Online";
-					$msgs[] = "MODT: ".$sss->getMODTs()[$hostname."@".$port].TF::RESET;
+		    		$msgs[] = TF::GREEN."Status: Online";
+					$msgs[] = TF::GREEN."MODT: ".TF::RESET.$sss->getMODTs()[$hostname."@".$port].TF::RESET;
 					$playerData = $sss->getPlayerData()[$hostname."@".$port];
-					$msgs[] = "Players: ".$playerData[0]."/".$playerData[1];
+					$msgs[] = TF::GREEN."Players: ".TF::DARK_GRAY.$playerData[0].TF::GRAY."/".TF::DARK_GRAY.$playerData[1];
 			    }else{
-			    	$msgs[] = "Status: Offline";
+			    	$msgs[] = TF::GREEN."Status: ".TF::DARK_RED."Offline";
 			    }
 			}
 			return $msgs;

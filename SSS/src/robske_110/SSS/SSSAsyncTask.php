@@ -84,34 +84,32 @@ class SSSAsyncTask extends AsyncTask{
 		  var_dump($this->doCheckServer);
   	  }
 	  $timeout = explode(".", (string) $this->timeout);
+	  $serverFINALdata = [];
 	  foreach($this->doCheckServer as $server){
-		  $doCheck = $server[1];
-		  if($doCheck){
-			  $adressArray = $server[0];
-			  $ip = $adressArray[0];
-			  $port = $adressArray[1];
-			  $return = $this->doQuery($ip, $port, $timeout);
-			  $returnState = $return[0];
-			  $queryResult = $return[1];
-			  $serverData = [];
-			  if($this->debug){
-			    echo("returnState:\n");
-			  	var_dump($returnState);
-			  }
-			  switch($returnState){
-				  case -1;
-					  $serverData[2] = false;
-			  	  break;
-				  case 0:
-				  	  $serverData[2] = false;
-				  break;
-				  case 1:
-				      $serverData[0] = [$queryResult['numplayers'], $queryResult['maxplayers']];
-				      $serverData[1] = $queryResult['hostname'];
-					  $serverData[2] = true;
-			  }
-			  $serverFINALdata[$ip."@".$port] = $serverData;
+		  $adressArray = $server[0];
+		  $ip = $adressArray[0];
+		  $port = $adressArray[1];
+		  $return = $this->doQuery($ip, $port, $timeout);
+		  $returnState = $return[0];
+		  $queryResult = $return[1];
+		  $serverData = [];
+		  if($this->debug){
+		    echo("returnState:\n");
+		  	var_dump($returnState);
 		  }
+		  switch($returnState){
+			  case -1;
+				  $serverData[2] = false;
+		  	  break;
+			  case 0:
+			  	  $serverData[2] = false;
+			  break;
+			  case 1:
+			      $serverData[0] = [$queryResult['numplayers'], $queryResult['maxplayers']];
+			      $serverData[1] = $queryResult['hostname'];
+				  $serverData[2] = true;
+		  }
+		  $serverFINALdata[$ip."@".$port] = $serverData;
 	  }
 	  $this->setResult($serverFINALdata);
 	  if($this->debug){

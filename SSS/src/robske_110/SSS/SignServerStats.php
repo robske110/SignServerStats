@@ -161,8 +161,12 @@ class SignServerStats extends PluginBase{
 		return $foundSign;
 	}
 	
-	public function addServer(string $ip, int $port, bool $active = true){
-		$this->doCheckServers[$ip."@".$port] = [[$ip, $port], $active];
+	public function addServer(string $ip, int $port): bool{
+		if(isset($this->doCheckServers[$ip."@".$port])){
+			return false;
+		}
+		$this->doCheckServers[$ip."@".$port] = [[$ip, $port]];
+		return true;
 	}
 	
 	public function removeServer(string $ip, int $port): bool{
@@ -188,9 +192,6 @@ class SignServerStats extends PluginBase{
 	public function asyncTaskCallBack($data, $scheduleTime){
 		$this->asyncTaskIsRunning = false;
 		$this->lastRefreshTick = $scheduleTime;
-		if(!is_array($data)){
-			return;
-		}
 		if($this->debug){
 			$this->getLogger()->debug("AsyncTaskResponse:");
 			var_dump($data);
@@ -198,6 +199,9 @@ class SignServerStats extends PluginBase{
 		$this->asyncTaskMODTs = [];
 		$this->asyncTaskPlayers = [];
 		$this->asyncTaskIsOnline = [];
+		if(empty($data)){
+			return;
+		}
 		foreach($data as $serverID => $serverData){
 			$this->asyncTaskIsOnline[$serverID] = $serverData[2];
 			if($serverData[2]){
