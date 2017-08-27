@@ -14,20 +14,25 @@ class WarnTask extends PluginTask{
 		$this->plugin = $plugin;
 	}
 	
-	public function getStatusListServers(StatusList $sl): array{
-		return $sl->getStatusGetTask()->getStatusServers();
-	}
-	
 	public function onRun(int $currentTick){
 		if(($sl = $this->plugin->getSL()) === null){
+			$this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
 			return;
 		}
-		$statusListServers = $this->getStatusListServers($sl);
+		
+		$statusListServers = $sl->getStatusListManager()->getStatusServers();
+		
 		foreach($statusListServers as $index => $statusListServer){
 			if(!isset($this->watchServers[$index])){
 				$this->watchServers[$index] = null;
 			}
 		}
+		foreach($this->watchServers as $index => $watchServer){
+			if(!isset($statusListServers[$index])){
+				unset($this->watchServers[$index]);
+			}
+		}
+		
 		foreach($statusListServers as $index => $statusListServer){
 			if($statusListServer[2]){
 				if($this->watchServers[$index] === false){
@@ -41,6 +46,5 @@ class WarnTask extends PluginTask{
 				$this->watchServers[$index] = false;
 		    }
 		}
-		//TODO: fix mem leak if server removed
 	}
 }

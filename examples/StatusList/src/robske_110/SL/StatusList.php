@@ -11,32 +11,32 @@ use pocketmine\utils\TextFormat as TF;
 class StatusList extends PluginBase{
 		
 	const SSS_API_VERSION = "1.0.0";
-		
+	const API_VERSION = "1.0.0";
+	
 	/** @var StatusGetTask */
-	private $statusGetTask;
+	private $statusListManager;
 	
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
-		if(($sss = $this->getSSS()) !== NULL){
+		if(($sss = $this->getSSS()) !== null){
 			if(!$sss->isCompatible(self::SSS_API_VERSION)){
-				$newOld = version_compare(self::SSS_API_VERSION, SignServerStats::SSS_API_VERSION, ">") ? "old" : "new";
+				$newOld = version_compare(self::SSS_API_VERSION, SignServerStats::API_VERSION, ">") ? "old" : "new";
 				$this->getLogger()->critical("Your version of SignServerStats is too ".$newOld." for this plugin.");
 				$this->getServer()->getPluginManager()->disablePlugin($this);
 				return;
 			}
 		}else{
-			$this->getLogger()->critical("This plugin needs SignServerStats. And I couldn't find it :/ (Also, why did PM not prevent me from loading?)");
+			$this->getLogger()->critical("This plugin needs SignServerStats. And it couldn't be found :/ (Why didn't PM prevent me from loading?)");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
-		$this->statusGetTask = new StatusGetTask($this);
+		$this->statusListManager = new StatusListManager($this);
 		$this->db = new Config($this->getDataFolder()."StatusListDB.yml", Config::YAML, []); //TODO:betterDB
 		foreach($this->db->getAll() as $statusListServer){
 			$this->addStatusServer($statusListServer[0], $statusListServer[1], $sss, false);
 		}
-		$this->getServer()->getScheduler()->scheduleRepeatingTask($this->statusGetTask, 20);
 	}
-		
+	
 	public function getSSS(){ //:?SignServerStats
 		if(($sss = $this->getServer()->getPluginManager()->getPlugin("SignServerStats")) instanceof SignServerStats){
 			return $sss;
@@ -45,13 +45,25 @@ class StatusList extends PluginBase{
 			return NULL;
 		}
 	}
-		
-	public function getStatusGetTask(): StatusGetTask{
-		return $this->statusGetTask;
+	
+	public function isCompatible(string $apiVersion): bool{
+		$extensionApiVersion = explode(".", $apiVersion);
+		$myApiVersion = explode(".", self::API_VERSION);
+		if($extensionApiVersion[0] !== $myApiVersion[0]){
+			return false;
+		}
+		if($extensionApiVersion[1] > $myApiVersion[1]){
+			return false;
+		}
+		return true;
+	}
+	
+	public function getStatusListManager(): StatusListManager{
+		return $this->statusListManager;
 	}
 	
 	public function addStatusServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
-		if($this->statusGetTask->addStatusServer($hostname, $port)){
+		if($this->statusListManager->addStatusServer($hostname, $port)){
 			$sss->addServer($hostname, $port);
 			if($save){
 				$listServers = $this->db->getAll();
@@ -66,7 +78,7 @@ class StatusList extends PluginBase{
 	}
 	
 	public function remStatusServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
-		if($this->statusGetTask->remStatusServer($hostname, $port)){
+		if($this->statusListManager->remStatusServer($hostname, $port)){
 			$sss->removeServer($hostname, $port);
 			if($save){
 				$listServers = $this->db->getAll();
@@ -104,7 +116,7 @@ class StatusList extends PluginBase{
 			break;
 			case "statuslist show": //I personally hate the "pages" approach, MCPE and almost all terminals/ssh/rcon clients have scrollbars.
 					$sender->sendMessage(TF::GREEN."All StatusList servers:");
-					$listServers = $this->statusGetTask->getStatusServers();
+					$listServers = $this->statusListManager->getStatusServers();
 					$onlineCnt = 0;
 					$offlineCnt = 0;
 					foreach($listServers as $listServer){
@@ -119,7 +131,7 @@ class StatusList extends PluginBase{
 						);
 					}
 					
-					if(($statusServerRefreshTick = $this->statusGetTask->getStatusServerRefreshTick()) === -1){
+					if(($statusServerRefreshTick = $this->statusListManager->getStatusServerRefreshTick()) === -1){
 						$refreshText = TF::GRAY."NEVER";
 					}else{
 						$refreshText = round(($this->getServer()->getTick() - $statusServerRefreshTick) / 20, 1)."s ago";

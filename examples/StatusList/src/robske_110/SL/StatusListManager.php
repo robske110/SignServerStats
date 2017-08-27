@@ -4,7 +4,7 @@ namespace robske_110\SL;
 use pocketmine\scheduler\PluginTask;
 use pocketmine\utils\TextFormat as TF;
 
-class StatusGetTask extends PluginTask{
+class StatusListManager{
 	/** @var StatusList */
 	private $plugin;
 	/** @var array */
@@ -13,7 +13,6 @@ class StatusGetTask extends PluginTask{
 	private $dataRefreshTick = -1;
 	
 	public function __construct(StatusList $plugin){
-		parent::__construct($plugin);
 		$this->plugin = $plugin;
 	}
 	
@@ -36,6 +35,10 @@ class StatusGetTask extends PluginTask{
 	}
 	
 	public function getStatusServers(): array{
+		if(!$this->update()){
+			$this->plugin->getLogger()->critical("Unexpected error: Trying to get SignServerStats plugin instance failed!");
+			$this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
+		}
 		return $this->listServers;
 	}
 	
@@ -43,12 +46,14 @@ class StatusGetTask extends PluginTask{
 		return $this->dataRefreshTick;
 	}
 	
-	public function onRun(int $currentTick){
+	public function update(): bool{
 		if(($sss = $this->plugin->getSSS()) === null){
+			return false;
+		}
+		if(($lastRefreshTick = $sss->getLastRefreshTick()) > $this->dataRefreshTick){
 			return true;
 		}
 		$serverOnlineArray = $sss->getServerOnline();
-		$this->dataRefreshTick = $sss->getLastRefreshTick();
 		foreach($this->listServers as $index => $listServer){
 			if(isset($serverOnlineArray[$index])){
 		    	$this->listServers[$index][2] = $serverOnlineArray[$index];
@@ -56,5 +61,7 @@ class StatusGetTask extends PluginTask{
 				$this->listServers[$index][2] = null;
 			}
 		}
+		$this->dataRefreshTick = $lastRefreshTick;
+		return true;
 	}
 }
