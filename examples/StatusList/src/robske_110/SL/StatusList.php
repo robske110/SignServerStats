@@ -83,7 +83,7 @@ class StatusList extends PluginBase{
 	
 	public function remStatusServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
 		if($this->statusListManager->remStatusServer($hostname, $port)){
-			if(isset($this->ownedServers[$hostname."@".$port])){
+			if(array_key_exists($hostname."@".$port, $this->ownedServers)){
 				$sss->removeServer($hostname, $port);
 				unset($this->ownedServers[$hostname."@".$port]);
 			}

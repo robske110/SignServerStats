@@ -6,22 +6,22 @@
  | | | (_) | |_) \__ \   <  __/  ______  | || | |_| |
  |_|  \___/|_.__/|___/_|\_\___| |______| |_||_|\___/                      
 */
-namespace robske_110\SSS;
+namespace robske_110\sss;
 
 use pocketmine\scheduler\PluginTask;
 
-class SSSAsyncTaskCaller extends PluginTask{
+class sssAsyncTaskCaller extends PluginTask{
 	/** @var SignServerStats */
-	private $SSS;
+	private $sss;
 	
 	public function __construct(SignServerStats $main){
 		parent::__construct($main);
-		$this->SSS = $main;
+		$this->sss = $main;
 	}
 	
 	public function onRun(int $currentTick){
-		if($this->SSS->isAllowedToStartAsyncTask()){
-			$this->SSS->startAsyncTask($currentTick);
+		if($this->sss->isAllowedToStartAsyncTask()){
+			$this->sss->startAsyncTask($currentTick);
 		}
 	}
 }

@@ -16,6 +16,7 @@ use pocketmine\tile\Sign;
 use pocketmine\Server;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
+use pocketmine\block\BlockIds;
 
 class SSSListener implements Listener{
 	private $main;
@@ -32,11 +33,15 @@ class SSSListener implements Listener{
 	
 	public function onBreak(BlockBreakEvent $event){ 
 		$block = $event->getBlock();
+		if($block->getId() !== BlockIds::WALL_SIGN && $block->getId() !== BlockIds::STANDING_SIGN){
+			return;
+		}
 		$player = $event->getPlayer();
 		$levelName = $player->getLevel()->getFolderName();
-		if($this->main->doesSignExist($block, $levelName)){
+		$index = 0; //todo change to null php 7.2
+		if($this->main->doesSignExist($block, $levelName, $index)){
 			if($this->main->isAdmin($player)){ 
-				if($this->main->removeSign($block, $levelName)){
+				if($this->main->internalRemoveSign($block, $levelName, $index)){
 					$this->sendSSSmessage($player, TF::GREEN."Sign sucessfully deleted!");
 				}else{
 					$this->server->broadcast(TF::RED."CRITICAL/r003: removeSign() returned false. Has the sign already been removed?", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);

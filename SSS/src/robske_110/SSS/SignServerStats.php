@@ -121,8 +121,7 @@ class SignServerStats extends PluginBase{
 	public function doesSignExist(Vector3 $pos, string $levelName, int &$index = 0): bool{
 		$deParsedPos = [$pos->x, $pos->y, $pos->z, $levelName];
 		foreach($this->doRefreshSigns as $key => $signData){
-			$pos = $signData[0];
-			if($deParsedPos == [$pos[0], $pos[1], $pos[2], $pos[3]]){
+			if($deParsedPos == $signData[0]){
 				$index = $key;
 				return true;
 			}
@@ -142,23 +141,8 @@ class SignServerStats extends PluginBase{
 		$this->doRefreshSigns = $this->db->getAll();
 	}
 	
-	public function removeSign(Vector3 $pos, $levelName): bool{
-		$foundSign = false;
-		$deParsedPos = [$pos->x, $pos->y, $pos->z, $levelName];
-		foreach($this->doRefreshSigns as $key => $signData){
-			$pos = $signData[0];
-			if($deParsedPos == [$pos[0], $pos[1], $pos[2], $pos[3]]){
-				$foundSign = true;
-				$this->db->remove($key);
-				$signArray = $this->db->getAll();
-				$signArray = array_values($signArray);
-				$this->doRefreshSigns = $signArray;
-				$this->db->setAll($signArray);
-				$this->db->save(true);
-				$this->removeServer($signData[1][0], $signData[1][1]);
-			}
-		}
-		return $foundSign;
+	public function removeSign(Vector3 $pos, string $levelName): bool{
+		return $this->internalRemoveSign($pos, $levelName);
 	}
 	
 	public function addServer(string $ip, int $port): bool{
@@ -176,6 +160,29 @@ class SignServerStats extends PluginBase{
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	  * @internal
+	  */
+	public function internalRemoveSign(Vector3 $pos, string $levelName, $index = null): bool{ //php 7.2 add ?int typehint
+		if($index === null){
+			$index = 0; //todo remove with php7.2 and add ?int typehint at doesSignExist
+			$foundSign = $this->doesSignExist($pos, $levelName, $index);
+		}else{
+			$foundSign = true;
+		}
+		if($foundSign){
+			$signData = $this->doRefreshSigns[$index];
+			$signArray = $this->db->getAll();
+			unset($signArray[$index]);
+			$signArray = array_values($signArray);
+			$this->doRefreshSigns = $signArray;
+			$this->db->setAll($signArray);
+			$this->db->save(true);
+			$this->removeServer($signData[1][0], $signData[1][1]);
+		}
+		return $foundSign;
 	}
 	
 	/**
