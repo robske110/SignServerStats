@@ -1,0 +1,30 @@
+#Travis CI
+
+language: php
+
+dist: trusty
+sudo: false
+
+php:
+ - 7.0
+
+branches:
+ - master
+
+before_script:
+ - git clone --recursive https://github.com/pmmp/PocketMine-MP.git
+ - pecl install channel://pecl.php.net/pthreads-3.1.6
+ - echo | pecl install channel://pecl.php.net/yaml-2.0.2
+ - cd PocketMine-MP
+ - mkdir plugins
+ - cd plugins
+ - wget -O DevTools.phar https://poggit.pmmp.io/r/10317/PocketMine-DevTools.phar
+ - cd /home/travis/build/robske110/SSS/
+ - cp -rf Travis.php PocketMine-MP/
+ - cd PocketMine-MP
+
+script:
+ - php Travis.php
+ 
+notifications:
+ email: false
