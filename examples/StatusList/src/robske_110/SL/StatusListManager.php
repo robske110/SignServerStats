@@ -50,7 +50,7 @@ class StatusListManager{
 		if(($sss = $this->plugin->getSSS()) === null){
 			return false;
 		}
-		if(($lastRefreshTick = $sss->getLastRefreshTick()) > $this->dataRefreshTick){
+		if(($lastRefreshTick = $sss->getLastRefreshTick()) < $this->dataRefreshTick){
 			return true;
 		}
 		$serverOnlineArray = $sss->getServerOnline();
