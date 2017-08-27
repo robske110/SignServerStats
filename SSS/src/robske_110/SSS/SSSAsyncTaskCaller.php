@@ -6,11 +6,11 @@
  | | | (_) | |_) \__ \   <  __/  ______  | || | |_| |
  |_|  \___/|_.__/|___/_|\_\___| |______| |_||_|\___/                      
 */
-namespace robske_110\sss;
+namespace robske_110\SSS;
 
 use pocketmine\scheduler\PluginTask;
 
-class sssAsyncTaskCaller extends PluginTask{
+class SSSAsyncTaskCaller extends PluginTask{
 	/** @var SignServerStats */
 	private $sss;
 	
