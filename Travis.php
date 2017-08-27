@@ -21,7 +21,7 @@ $server = proc_open(PHP_BINARY . " src/pocketmine/PocketMine.php --no-wizard --d
 ], $pipes);
 
 function sendCommand(string $cmd, $pipes){
-	fwrite($pipes[0], $cmd."\n";
+	fwrite($pipes[0], $cmd."\n");
 }
 
 sendCommand("version", $pipes);
