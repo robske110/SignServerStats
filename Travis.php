@@ -1,5 +1,5 @@
 <?php
-$repoPath = "/home/travis/build/robske110/SSS/";
+$repoPath = "/home/travis/build/robske110/SignServerStats/";
 $plugins = ["SignServerStats" => ["./SSS/", true], "StatusList" => ["./examples/StatusList/", true], "WarnOffline" => ["./examples/WarnOffline", true], "DumpInfo" => ["./examples/DumpInfo.php" , false]];
 
 exec("cd ".$repoPath);
@@ -27,7 +27,7 @@ function sendCommand(string $cmd, $pipes){
 sendCommand("version", $pipes);
 foreach($plugins as $pluginName => $info){
 	if($info[1]){
-		sendCommand("makeplugin ".$plugin, $pipes);
+		sendCommand("makeplugin ".$pluginName, $pipes);
 	}
 }
 sendCommand("stop", $pipes);
