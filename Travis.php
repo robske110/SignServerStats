@@ -1,18 +1,17 @@
 <?php
 $repoPath = "/home/travis/build/robske110/SignServerStats/";
-$plugins = ["SignServerStats" => ["./SSS/", true], "StatusList" => ["./examples/StatusList/", true], "WarnOffline" => ["./examples/WarnOffline", true], "DumpInfo" => ["./examples/DumpInfo.php" , false]];
+$plugins = ["SignServerStats" => ["SSS/", true], "StatusList" => ["examples/StatusList/", true], "WarnOffline" => ["examples/WarnOffline", true], "DumpInfo" => ["examples/DumpInfo.php" , false]];
 
-exec("cd ".$repoPath);
 foreach($plugins as $info){
+	$info[0] = $repoPath.$info[0];
 	if($info[1]){
-		exec("cp -rf ".$info[0]." ./PocketMine-MP/plugins/");
-		echo("exec: "."cp -rf ".$info[0]." ./PocketMine-MP/plugins/");
+		echo("exec: "."cp -rf ".$info[0]." ./plugins/");
+		exec("cp -rf ".$info[0]." ./plugins/");
 	}else{
-		exec("cp -f ".$info[0]." ./PocketMine-MP/plugins/");
-		echo("exec: "."cp -f ".$info[0]." ./PocketMine-MP/plugins/");
+		echo("exec: "."cp -f ".$info[0]." ./plugins/");
+		exec("cp -f ".$info[0]." ./plugins/");
 	}
 }
-exec("cd PocketMine-MP");
 
 $server = proc_open(PHP_BINARY . " src/pocketmine/PocketMine.php --no-wizard --disable-readline", [
 	0 => ["pipe", "r"],
