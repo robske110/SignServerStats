@@ -16,7 +16,7 @@ class StatusList extends PluginBase{
 	/** @var StatusListManager */
 	private $statusListManager;
 	/** @var array */
-	private $ownedServer;
+	private $ownedServers;
 	
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
