@@ -28,7 +28,7 @@ class StatusList extends PluginBase{
 				return;
 			}
 		}else{
-			$this->getLogger()->critical("This plugin needs SignServerStats. And it couldn't be found :/ (Why didn't PM prevent me from loading?)");
+			$this->getLogger()->critical("SignServerStats is required for this plugin. PM ignored my dependencies!");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
@@ -141,26 +141,47 @@ class StatusList extends PluginBase{
 					if(($statusServerRefreshTick = $this->statusListManager->getStatusServerRefreshTick()) === -1){
 						$refreshText = TF::GRAY."NEVER";
 					}else{
-						$refreshText = round(($this->getServer()->getTick() - $statusServerRefreshTick) / 20, 1)."s ago";
+						$refreshText = TF::DARK_GRAY.round(($this->getServer()->getTick() - $statusServerRefreshTick) / 20, 1)."s ago";
 					}
-					$sender->sendMessage(TF::GREEN."Total: ".count($listServers)." Online: ".$onlineCnt." Offline: ".$offlineCnt." Last Refresh: ".$refreshText);
+					$sender->sendMessage(
+						TF::GREEN."Total: ".TF::DARK_GRAY.count($listServers).TF::GREEN.
+						" Online: ".TF::DARK_GRAY.$onlineCnt.TF::GREEN.
+						" Offline: ".TF::DARK_GRAY.$offlineCnt.TF::GREEN.
+						" Last Refresh: ".$refreshText
+					);
 				return true;
 			break;
 		}
 		switch($command->getName()){
 			case "statuslist add":
 				if($this->addStatusServer($hostname, $port, $sss)){
-					$sender->sendMessage(TF::GREEN."Successfully added the server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::GREEN." to the statuslist.");
+					$sender->sendMessage(
+						TF::GREEN."Successfully added the server ".
+						TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::GREEN.
+						" to the statuslist."
+					);
 				}else{
-					$sender->sendMessage(TF::DARK_RED."The server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::DARK_RED." is already on the statuslist!");
+					$sender->sendMessage(
+						TF::DARK_RED."The server ".
+						TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::DARK_RED.
+						" is already on the statuslist!"
+					);
 				}
 				return true;
 			break;
 			case "statuslist rem":
 				if($this->remStatusServer($hostname, $port, $sss)){
-					$sender->sendMessage(TF::GREEN."Successfully removed the server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::GREEN." from the statuslist.");
+					$sender->sendMessage(
+						TF::GREEN."Successfully removed the server ".
+						TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::GREEN.
+						" from the statuslist."
+					);
 				}else{
-					$sender->sendMessage(TF::DARK_RED."The server ".TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::DARK_RED." is not on the statuslist!");
+					$sender->sendMessage(
+						TF::DARK_RED."The server ".
+						TF::DARK_GRAY.$hostname.TF::GRAY.":".TF::DARK_GRAY.$port.TF::DARK_RED.
+						" is not on the statuslist!"
+					);
 				}
 				return true;
 			break;

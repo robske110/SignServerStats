@@ -25,7 +25,7 @@ class WarnOffline extends PluginBase{
 				return;
 			}
 		}else{
-			$this->getLogger()->critical("This plugin needs StatusList. And it couldn't be found. :/ (Why didn't PM prevent me from loading?)");
+			$this->getLogger()->critical("StatusList is required for this plugin. PM ignored my dependencies!");
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}

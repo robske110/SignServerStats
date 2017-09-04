@@ -36,12 +36,18 @@ class WarnTask extends PluginTask{
 		foreach($statusListServers as $index => $statusListServer){
 			if($statusListServer[2]){
 				if($this->watchServers[$index] === false){
-					$this->plugin->notifyMsg(TF::AQUA."Server ".$statusListServer[0].TF::GRAY.":".TF::AQUA.$statusListServer[1]." went back ".TF::GREEN."ONLINE", false);
+					$this->plugin->notifyMsg(
+						TF::AQUA."Server ".$statusListServer[0].TF::GRAY.":".TF::AQUA.$statusListServer[1].
+						" went back ".TF::GREEN."ONLINE", false
+					);
 				}
 		   		$this->watchServers[$index] = true;
 			}elseif($statusListServer[2] !== null){
 				if($this->watchServers[$index] !== false){
-					$this->plugin->notifyMsg(TF::YELLOW."Server ".$statusListServer[0].TF::GRAY.":".TF::YELLOW.$statusListServer[1]." went ".TF::DARK_RED."OFFLINE");
+					$this->plugin->notifyMsg(
+						TF::YELLOW."Server ".$statusListServer[0].TF::GRAY.":".TF::YELLOW.$statusListServer[1].
+						" went ".TF::DARK_RED."OFFLINE"
+					);
 				}
 				$this->watchServers[$index] = false;
 		    }
