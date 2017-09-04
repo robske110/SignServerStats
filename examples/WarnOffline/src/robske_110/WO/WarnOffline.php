@@ -33,7 +33,7 @@ class WarnOffline extends PluginBase{
 		$this->getServer()->getScheduler()->scheduleRepeatingTask($this->warnTask, 20);
 	}
 	
-	public function getSL(){ //:?StatusList
+	public function getSL(): ?StatusList{
 		if(($sl = $this->getServer()->getPluginManager()->getPlugin("StatusList")) instanceof StatusList){
 			return $sl;
 		}else{

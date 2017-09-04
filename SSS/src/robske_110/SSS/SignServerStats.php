@@ -118,7 +118,7 @@ class SignServerStats extends PluginBase{
 		return $player->hasPermission("SSS.signs");
 	}
 	
-	public function doesSignExist(Vector3 $pos, string $levelName, int &$index = 0): bool{
+	public function doesSignExist(Vector3 $pos, string $levelName, ?int &$index = 0): bool{
 		$deParsedPos = [$pos->x, $pos->y, $pos->z, $levelName];
 		foreach($this->doRefreshSigns as $key => $signData){
 			if($deParsedPos == $signData[0]){
@@ -165,9 +165,8 @@ class SignServerStats extends PluginBase{
 	/**
 	  * @internal
 	  */
-	public function internalRemoveSign(Vector3 $pos, string $levelName, $index = null): bool{ //php 7.2 add ?int typehint
+	public function internalRemoveSign(Vector3 $pos, string $levelName, ?int $index = null): bool{
 		if($index === null){
-			$index = 0; //todo remove with php7.2 and add ?int typehint at doesSignExist
 			$foundSign = $this->doesSignExist($pos, $levelName, $index);
 		}else{
 			$foundSign = true;

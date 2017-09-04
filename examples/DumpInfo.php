@@ -56,12 +56,12 @@ namespace robske_110\DPS{
 			$this->getServer()->getScheduler()->scheduleRepeatingTask($this->displayTask, 10);
 		}
 		
-		public function getSSS(){
+		public function getSSS(): ?SignServerStats{
 			if(($sss = $this->getServer()->getPluginManager()->getPlugin("SignServerStats")) instanceof SignServerStats){
 				return $sss;
 			}else{
 				$this->getLogger()->critical("Unexpected error: Trying to get SignServerStats plugin instance failed!");
-				return NULL;
+				return null;
 			}
 		}
 		

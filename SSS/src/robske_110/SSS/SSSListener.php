@@ -44,7 +44,10 @@ class SSSListener implements Listener{
 				if($this->main->internalRemoveSign($block, $levelName, $index)){
 					$this->sendSSSmessage($player, TF::GREEN."Sign sucessfully deleted!");
 				}else{
-					$this->server->broadcast(TF::RED."CRITICAL/r003: removeSign() returned false. Has the sign already been removed?", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+					$this->server->broadcast(
+						TF::RED."CRITICAL/r003: removeSign() returned false. Has the sign already been removed?",
+						Server::BROADCAST_CHANNEL_ADMINISTRATIVE
+					);
 				}
 				$this->main->recalcdRSvar();
 			}else{

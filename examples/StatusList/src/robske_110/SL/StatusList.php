@@ -39,7 +39,7 @@ class StatusList extends PluginBase{
 		}
 	}
 	
-	public function getSSS(){ //:?SignServerStats
+	public function getSSS(): ?SignServerStats{
 		if(($sss = $this->getServer()->getPluginManager()->getPlugin("SignServerStats")) instanceof SignServerStats){
 			return $sss;
 		}else{
