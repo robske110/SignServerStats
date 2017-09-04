@@ -86,18 +86,16 @@ class SSSAsyncTask extends AsyncTask{
 	  $timeout = explode(".", (string) $this->timeout);
 	  $serverFINALdata = [];
 	  foreach($this->doCheckServer as $server){
-		  $adressArray = $server[0];
-		  $ip = $adressArray[0];
-		  $port = $adressArray[1];
+		  $ip = $server[0];
+		  $port = $server[1];
 		  $return = $this->doQuery($ip, $port, $timeout);
-		  $returnState = $return[0];
 		  $queryResult = $return[1];
 		  $serverData = [];
 		  if($this->debug){
 		    echo("returnState:\n");
-		  	var_dump($returnState);
+		  	var_dump($return[0]);
 		  }
-		  switch($returnState){
+		  switch($return[0]){
 			  case -1;
 				  $serverData[2] = false;
 		  	  break;

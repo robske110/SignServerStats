@@ -149,7 +149,7 @@ class SignServerStats extends PluginBase{
 		if(isset($this->doCheckServers[$ip."@".$port])){
 			return false;
 		}
-		$this->doCheckServers[$ip."@".$port] = [[$ip, $port]];
+		$this->doCheckServers[$ip."@".$port] = [$ip, $port];
 		return true;
 	}
 	
