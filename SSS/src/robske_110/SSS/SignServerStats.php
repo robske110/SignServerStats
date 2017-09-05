@@ -118,7 +118,7 @@ class SignServerStats extends PluginBase{
 		return $player->hasPermission("SSS.signs");
 	}
 	
-	public function doesSignExist(Vector3 $pos, string $levelName, ?int &$index = 0): bool{
+	public function doesSignExist(Vector3 $pos, string $levelName, ?int &$index = null): bool{
 		$deParsedPos = [$pos->x, $pos->y, $pos->z, $levelName];
 		foreach($this->doRefreshSigns as $key => $signData){
 			if($deParsedPos == $signData[0]){
@@ -164,6 +164,8 @@ class SignServerStats extends PluginBase{
 	
 	/**
 	  * @internal
+	  *
+	  * WARNING: Do not use this function. Use @link{this->removeSign}!
 	  */
 	public function internalRemoveSign(Vector3 $pos, string $levelName, ?int $index = null): bool{
 		if($index === null){
@@ -235,10 +237,16 @@ class SignServerStats extends PluginBase{
 					$lines = $this->calcSign($adress);
 					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
 				}else{
-					$this->server->broadcast(TF::RED."[SSS] r001 Could not find the sign at (".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+					$this->server->broadcast(
+						TF::RED."[SSS] r001 Could not find the sign at (".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")",
+						Server::BROADCAST_CHANNEL_ADMINISTRATIVE
+					);
 				}
 			}else{
-				$this->server->broadcast(TF::RED."[SSS] r002 Could not find the level for the sign at (".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")", Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
+				$this->server->broadcast(
+					TF::RED."[SSS] r002 Could not find the level for the sign at (".$pos[0]."/".$pos[1]."/".$pos[2]." in ".$pos[3].")",
+					Server::BROADCAST_CHANNEL_ADMINISTRATIVE
+				);
 			}
 		}
 	}

@@ -38,9 +38,9 @@ class SSSListener implements Listener{
 		}
 		$player = $event->getPlayer();
 		$levelName = $player->getLevel()->getFolderName();
-		$index = 0; //todo change to null php 7.2
+		$index = null;
 		if($this->main->doesSignExist($block, $levelName, $index)){
-			if($this->main->isAdmin($player)){ 
+			if($this->main->isAdmin($player)){
 				if($this->main->internalRemoveSign($block, $levelName, $index)){
 					$this->sendSSSmessage($player, TF::GREEN."Sign sucessfully deleted!");
 				}else{
