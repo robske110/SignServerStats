@@ -13,6 +13,7 @@ branches:
 
 before_script:
  - git clone --recursive https://github.com/pmmp/PocketMine-MP.git
+ - git checkout php/7.0
  - pecl install channel://pecl.php.net/pthreads-3.1.6
  - echo | pecl install channel://pecl.php.net/yaml-2.0.2
  - cd PocketMine-MP
