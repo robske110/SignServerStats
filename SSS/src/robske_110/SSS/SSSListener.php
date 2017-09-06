@@ -27,6 +27,10 @@ class SSSListener implements Listener{
 		$this->server = $main->getServer();
 	}
 	
+	/**
+	 * @param Player $player
+	 * @param string $msg
+	 */
 	private function sendSSSmessage(Player $player, string $msg){
 		$player->sendMessage(TF::GRAY."[SSS] ".$msg);
 	}

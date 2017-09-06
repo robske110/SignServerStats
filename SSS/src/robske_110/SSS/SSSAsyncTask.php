@@ -28,8 +28,15 @@ class SSSAsyncTask extends AsyncTask{
 	  $this->timeout = $timeout;
 	  $this->startTick = $startTick;
   }
-  
-  private function doQuery(string $ip, int $port, array $timeout): array{
+	
+	/**
+	 * @param string $ip
+	 * @param int $port
+	 * @param array $timeout
+	 *
+	 * @return array
+	 */
+	private function doQuery(string $ip, int $port, array $timeout): array{
   	  if($this->debug){
   	  	echo("doQuery:\n");
   	  }
@@ -66,14 +73,14 @@ class SSSAsyncTask extends AsyncTask{
       array_pop($response);
       array_pop($response);
       $return = [];
-      $type = 0;
 	  if($this->debug){
 		  var_dump($response);
       }
-      foreach ($response as $key){
-          if ($type == 0) $val = $key;
-          if ($type == 1) $return[$val] = $key;
-          $type == 0 ? $type = 1 : $type = 0;
+	  $type = true;
+      foreach($response as $key){
+          if($type) $val = $key;
+          if(!$type) $return[$val] = $key;
+          $type = !$type;
 	  }	
   	  return [1, $return];
   }

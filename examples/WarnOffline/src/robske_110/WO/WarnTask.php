@@ -1,7 +1,6 @@
 <?php
 namespace robske_110\WO;
 
-use robske_110\SL\StatusList;
 use pocketmine\scheduler\PluginTask;
 use pocketmine\utils\TextFormat as TF;
 

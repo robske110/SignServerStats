@@ -3,9 +3,6 @@ namespace robske_110\WO;
 
 use robske_110\SL\StatusList;
 use pocketmine\plugin\PluginBase;
-use pocketmine\utils\Config;
-use pocketmine\command\Command;
-use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat as TF;
 
 class WarnOffline extends PluginBase{
@@ -33,6 +30,9 @@ class WarnOffline extends PluginBase{
 		$this->getServer()->getScheduler()->scheduleRepeatingTask($this->warnTask, 20);
 	}
 	
+    /**
+     * @return null|StatusList
+     */
 	public function getSL(): ?StatusList{
 		if(($sl = $this->getServer()->getPluginManager()->getPlugin("StatusList")) instanceof StatusList){
 			return $sl;
@@ -42,6 +42,10 @@ class WarnOffline extends PluginBase{
 		}
 	}
 	
+    /**
+     * @param string $msg
+     * @param bool   $warn Whether to put out a warning or a notice to the console
+     */
 	public function notifyMsg(string $msg, bool $warn = true){
 		foreach($this->getServer()->getOnlinePlayers() as $player){
 			if($player->hasPermission("WarnOffline.notify")){

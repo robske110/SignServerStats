@@ -82,6 +82,14 @@ class SignServerStats extends PluginBase{
 		);
 	}
 	
+	/**
+	 * This is for extension plugins to test if they are compatible with the version
+	 * of PP installed. Extensions should be disabled/disable any interfaces with this plugin if this returns false.
+	 *
+	 * @param string $apiVersion The API version your plugin was last tested on.
+	 *
+	 * @return bool Indicates whether your plugin is compatible.
+	 */
 	public function isCompatible(string $apiVersion): bool{
 		$extensionApiVersion = explode(".", $apiVersion);
 		$myApiVersion = explode(".", self::API_VERSION);
@@ -94,30 +102,52 @@ class SignServerStats extends PluginBase{
 		return true;
 	}
 	
+	/**
+	 * Returns the Tick in which the oldest data was refreshed.
+	 *
+	 * @return int
+	 */
 	public function getLastRefreshTick(): int{
 		return $this->lastRefreshTick;
 	}
 	
+	/**
+	 * @return array [string $serverID => bool $isOnline]
+	 */
 	public function getServerOnline(): array{
 		return $this->asyncTaskIsOnline;
 	}
 	
+	/**
+	 * @return array [string $serverID => string $modt]
+	 */
 	public function getMODTs(): array{
 		return $this->asyncTaskMODTs;
 	}
 	
+	/**
+	 * @return array [string $serverID => [int $numplayers, int $maxplayers]]
+	 */
 	public function getPlayerData(): array{
 		return $this->asyncTaskPlayers;
 	}
 	
-	public function debugEnabled(): bool{
-		return $this->debug;
-	}
-	
+	/**
+	 * @param Player $player
+	 *
+	 * @return bool
+	 */
 	public function isAdmin(Player $player): bool{
 		return $player->hasPermission("SSS.signs");
 	}
 	
+	/**
+	 * @param Vector3  $pos
+	 * @param string   $levelName
+	 * @param int|null $index Supply a variable with content null to get the index of the sign in doRefreshSigns
+	 *
+	 * @return bool doesExist
+	 */
 	public function doesSignExist(Vector3 $pos, string $levelName, ?int &$index = null): bool{
 		$deParsedPos = [$pos->x, $pos->y, $pos->z, $levelName];
 		foreach($this->doRefreshSigns as $key => $signData){
@@ -129,6 +159,12 @@ class SignServerStats extends PluginBase{
 		return false;
 	}
 	
+	/**
+	 * @param string  $ip
+	 * @param int     $port
+	 * @param Vector3 $pos
+	 * @param string $levelName
+	 */
 	public function addSign(string $ip, int $port, Vector3 $pos, string $levelName){
 		$index = 0;
 		if($this->doesSignExist($pos, $levelName, $index)){
@@ -141,10 +177,22 @@ class SignServerStats extends PluginBase{
 		$this->doRefreshSigns = $this->db->getAll();
 	}
 	
+	/**
+	 * @param Vector3 $pos
+	 * @param string  $levelName
+	 *
+	 * @return bool Success
+	 */
 	public function removeSign(Vector3 $pos, string $levelName): bool{
 		return $this->internalRemoveSign($pos, $levelName);
 	}
 	
+	/**
+	 * @param string $ip
+	 * @param int $port
+	 *
+	 * @return bool Success (if false is returned server is already added)
+	 */
 	public function addServer(string $ip, int $port): bool{
 		if(isset($this->doCheckServers[$ip."@".$port])){
 			return false;
@@ -153,6 +201,12 @@ class SignServerStats extends PluginBase{
 		return true;
 	}
 	
+	/**
+	 * @param string $ip
+	 * @param int $port
+	 *
+	 * @return bool Success
+	 */
 	public function removeServer(string $ip, int $port): bool{
 		if(isset($this->doCheckServers[$ip."@".$port])){
 			unset($this->doCheckServers[$ip."@".$port]);
@@ -163,10 +217,16 @@ class SignServerStats extends PluginBase{
 	}
 	
 	/**
-	  * @internal
-	  *
-	  * WARNING: Do not use this function. Use @link{this->removeSign}!
-	  */
+	 * @internal
+	 *
+	 * WARNING: Do not use this function. Use @link{this->removeSign}!
+     *
+     * @param Vector3  $pos
+     * @param string   $levelName
+     * @param int|null $index
+     *
+     * @return bool $foundSign
+     */
 	public function internalRemoveSign(Vector3 $pos, string $levelName, ?int $index = null): bool{
 		if($index === null){
 			$foundSign = $this->doesSignExist($pos, $levelName, $index);
@@ -187,16 +247,30 @@ class SignServerStats extends PluginBase{
 	}
 	
 	/**
-	  * @internal
-	  */
+	 * @internal
+	 *
+	 * @return bool
+	 */
+	public function debugEnabled(): bool{
+		return $this->debug;
+	}
+	
+	/**
+	 * @internal
+	 *
+	 * @param $currTick
+	 */
 	public function startAsyncTask($currTick){
 		$this->asyncTaskIsRunning = true;
 		$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $this->timeout, $currTick));
 	}
 	
 	/**
-	  * @internal
-	  */
+	 * @internal
+	 *
+	 * @param $data
+	 * @param $scheduleTime
+	 */
 	public function asyncTaskCallBack($data, $scheduleTime){
 		$this->asyncTaskIsRunning = false;
 		$this->lastRefreshTick = $scheduleTime;
@@ -225,8 +299,8 @@ class SignServerStats extends PluginBase{
 	}
 	
 	/**
-	  * @internal
-	  */
+	 * @internal
+	 */
 	public function doSignRefresh(){
 		foreach($this->doRefreshSigns as $signData){
 			$pos = $signData[0];
@@ -252,15 +326,17 @@ class SignServerStats extends PluginBase{
 	}
 	
 	/**
-	  * @internal
-	  */
+	 * @internal
+	 *
+	 * @return bool
+	 */
 	public function isAllowedToStartAsyncTask(): bool{
 		return $this->signServerStatsCfg->get('always-start-async-task') ? true : !$this->asyncTaskIsRunning;
 	}
 	
 	/**
-	  * @internal
-	  */
+	 * @internal
+	 */
 	public function recalcdRSvar(){
 		foreach($this->doRefreshSigns as $signData){
 			$refreshSignIP = $signData[1];
@@ -269,11 +345,15 @@ class SignServerStats extends PluginBase{
 	}
 	
 	/**
-	  * @internal
-	  */
-	public function calcSign(array $adress): array{
-		$ip = $adress[0];
-		$port = $adress[1];
+	 * @internal
+	 *
+	 * @param array $address
+	 *
+	 * @return array $lines
+	 */
+	public function calcSign(array $address): array{
+		$ip = $address[0];
+		$port = $address[1];
 		if(isset($this->asyncTaskIsOnline[$ip."@".$port])){
 			$isOnline = $this->asyncTaskIsOnline[$ip."@".$port];
 			if($isOnline){

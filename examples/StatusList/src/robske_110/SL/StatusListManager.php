@@ -16,6 +16,14 @@ class StatusListManager{
 		$this->plugin = $plugin;
 	}
 	
+	/**
+	 * Adds a server to the StatusList, but does not check if it is already registered to SSS neither save it to disk.
+	 *
+	 * @param string $hostname
+	 * @param int    $port
+	 *
+	 * @return bool
+	 */
 	public function addStatusServer(string $hostname, int $port): bool{
 		if(!isset($this->listServers[$hostname."@".$port])){
 			$this->listServers[$hostname."@".$port] = [$hostname, $port, null];
@@ -25,6 +33,14 @@ class StatusListManager{
 		}
 	}
 	
+	/**
+	 * Adds a server to the StatusList, but does not check if it has been registered to SSS neither remove it to disk.
+	 *
+	 * @param string $hostname
+	 * @param int    $port
+	 *
+	 * @return bool
+	 */
 	public function remStatusServer(string $hostname, int $port): bool{
 		if(isset($this->listServers[$hostname."@".$port])){
 			unset($this->listServers[$hostname."@".$port]);
@@ -34,6 +50,11 @@ class StatusListManager{
 		}
 	}
 	
+	/**
+	 * Gets the Servers on the StatusList and performs an update, if available, on them beforehand
+	 *
+	 * @return array
+	 */
 	public function getStatusServers(): array{
 		if(!$this->update()){
 			$this->plugin->getLogger()->critical("Unexpected error: Trying to get SignServerStats plugin instance failed!");
@@ -42,6 +63,11 @@ class StatusListManager{
 		return $this->listServers;
 	}
 	
+	/**
+	 * Returns the Tick in which the data for the servers were started to be generated.
+	 *
+	 * @return int
+	 */
 	public function getStatusServerRefreshTick(): int{
 		return $this->dataRefreshTick;
 	}

@@ -39,6 +39,9 @@ class StatusList extends PluginBase{
 		}
 	}
 	
+	/**
+	 * @return null|SignServerStats
+	 */
 	public function getSSS(): ?SignServerStats{
 		if(($sss = $this->getServer()->getPluginManager()->getPlugin("SignServerStats")) instanceof SignServerStats){
 			return $sss;
@@ -48,6 +51,14 @@ class StatusList extends PluginBase{
 		}
 	}
 	
+	/**
+	 * This is for extension plugins to test if they are compatible with the version
+	 * of PP installed. Extensions should be disabled/disable any interfaces with this plugin if this returns false.
+	 *
+	 * @param string $apiVersion The API version your plugin was last tested on.
+	 *
+	 * @return bool Indicates whether your plugin is compatible.
+	 */
 	public function isCompatible(string $apiVersion): bool{
 		$extensionApiVersion = explode(".", $apiVersion);
 		$myApiVersion = explode(".", self::API_VERSION);
@@ -60,10 +71,23 @@ class StatusList extends PluginBase{
 		return true;
 	}
 	
+	/**
+	 * @return StatusListManager
+	 */
 	public function getStatusListManager(): StatusListManager{
 		return $this->statusListManager;
 	}
 	
+	/**
+	 * Adds a Server to the StatusList
+	 *
+	 * @param string		  $hostname
+	 * @param int			  $port
+	 * @param SignServerStats $sss
+	 * @param bool			  $save Whether the server should be saved to disk and reloaded on next reboot or not.
+	 *
+	 * @return bool
+	 */
 	public function addStatusServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
 		if($this->statusListManager->addStatusServer($hostname, $port)){
 			if($sss->addServer($hostname, $port)){
@@ -81,6 +105,16 @@ class StatusList extends PluginBase{
 		}
 	}
 	
+	/**
+	 * Removes a Server from the StatusList
+	 *
+	 * @param string		  $hostname
+	 * @param int			  $port
+	 * @param SignServerStats $sss
+	 * @param bool			  $save Whether the removal should be saved to disk and also be gone on next reboot or not.
+	 *
+	 * @return bool
+	 */
 	public function remStatusServer(string $hostname, int $port, SignServerStats $sss, bool $save = true): bool{
 		if($this->statusListManager->remStatusServer($hostname, $port)){
 			if(array_key_exists($hostname."@".$port, $this->ownedServers)){
