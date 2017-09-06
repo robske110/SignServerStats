@@ -3,7 +3,7 @@ A PocketMine plugin which can display player count and MODT on a sign from any s
 
 ## Info:
 ### Usage:
-Anyone with the permission SSS.signs can create a sign with the following content:
+Anyone with the permission `SSS.signs` can create a sign with the following content:
 ```
 [SSS]
 <serverIP>
@@ -15,13 +15,26 @@ The plugin will recognize that sign and fill it with colorful stats!
 *Note: Due to 1.1 not telling the server when the sign is finished, you need to tap the sign once to activate it after setting it up.*
 
 ### API:
-##### This plugin can also be used as a query API. You might want to look into SignServerStats.php, because all the API functions are in there.
+**This plugin can also be used as a query API. You might want to look into SignServerStats.php, because all the API functions are in there.**
+
 Example plugins are provided in /examples/:
-- DumpInfo.php - Dumps all availible info about a server.
+- DumpInfo.php - Dumps all available info about a server.
 
 Because the following two examples may also be useful for users, so they are also provided as phars in every release:
 - WarnOffline/ - Warns if a server has gone offline. Depends on StatusList (BETA)
 - StatusList/ - Lists online status and player count of multiple servers in a List. (BETA)
+
+_You should always check if your plugin is compatible with the version of StatusList present on the current server with the help of the isCompatible function_
+
+Example:
+```php
+/** @var robske_110\SSS\SignServerStats $signServerStats */
+if(!$signServerStats->isCompatible("1.0.0")){
+   	$this->getLogger()->critical("Your version of $signServerStats is not compatible with this plugin);
+	$this->getServer()->getPluginManager()->disablePlugin($this);
+	return;
+}
+```
 
 #### If you prefer just a quick introduction, here is one for getting the the online status of the server `someip.com:1234`:
 
@@ -32,7 +45,7 @@ $sss->addServer("someip.com", 1234);
 ```
 This tells SSS that it should query that server in its next query.
 
-##### IMPORTANT: You have to wait until the information is fetched asynchronously.
+**IMPORTANT: You have to wait until the information is fetched asynchronously.**
 
 To check if the server is online simply do this, it is recommended to do this in a task.
 ```php
