@@ -12,9 +12,17 @@ branches:
  - master
 
 before_script:
- - git clone --recursive https://github.com/pmmp/PocketMine-MP.git
- - pecl install channel://pecl.php.net/pthreads-3.1.6
+#- pecl install channel://pecl.php.net/pthreads-3.1.6
+ - git clone https://github.com/krakjoe/pthreads.git --depth=1
+ - cd pthreads
+ - phpize
+ - ./configure
+ - make
+ - make instal
+ - cd..
+ - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
  - echo | pecl install channel://pecl.php.net/yaml-2.0.2
+ - git clone --recursive https://github.com/pmmp/PocketMine-MP.git --depth=1
  - cd PocketMine-MP
  - mkdir plugins
  - cd plugins
