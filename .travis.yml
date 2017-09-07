@@ -19,7 +19,7 @@ before_script:
  - ./configure
  - make
  - make install
- - cd..
+ - cd ..
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
  - echo | pecl install channel://pecl.php.net/yaml-2.0.2
  - git clone --recursive https://github.com/pmmp/PocketMine-MP.git --depth=1
