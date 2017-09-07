@@ -18,7 +18,7 @@ before_script:
  - phpize
  - ./configure
  - make
- - make instal
+ - make install
  - cd..
  - echo "extension=pthreads.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
  - echo | pecl install channel://pecl.php.net/yaml-2.0.2
