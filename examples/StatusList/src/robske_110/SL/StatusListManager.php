@@ -1,9 +1,6 @@
 <?php
 namespace robske_110\SL;
 
-use pocketmine\scheduler\PluginTask;
-use pocketmine\utils\TextFormat as TF;
-
 class StatusListManager{
 	/** @var StatusList */
 	private $plugin;
