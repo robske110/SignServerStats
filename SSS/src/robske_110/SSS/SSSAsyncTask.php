@@ -40,7 +40,7 @@ class SSSAsyncTask extends AsyncTask{
   	  if($this->debug){
   	  	echo("doQuery:\n");
   	  }
-      $sock = @fsockopen("udp://".$ip,$port);
+      $sock = @fsockopen("udp://".$ip, $port);
       if(!$sock){return [-1, NULL];}
       socket_set_timeout($sock, $timeout[0], $timeout[1]);
       if(!@fwrite($sock, "\xFE\xFD\x09\x10\x20\x30\x40\xFF\xFF\xFF\x01")){return [0, NULL];}
