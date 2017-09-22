@@ -1,6 +1,6 @@
 name: SignServerStats
-api: [3.0.0-ALPHA7]
-version: 1.0.0-InDev-beta4
+api: [3.0.0-ALPHA7, 3.0.0-ALPHA8]
+version: 1.0.0
 load: POSTWORLD
 main: robske_110\SSS\SignServerStats
 author: robske_110

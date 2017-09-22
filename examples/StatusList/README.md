@@ -38,7 +38,7 @@ $sl->addStatusServer("someip.com", 1234, $sl->getSSS(), false); /* Last argument
 Checking if there the server `someip.com:1234` is online:
 ```php
 /** @var $sl robske_110\SL\StatusList */
-if(($status = $sl->getStatusListManager()->getStatusServers()["someip.com@1234"][2]) === true){
+if(($status = $sl->getStatusListManager()->getStatusServers()["someip.com"."@".1234][2]) === true){
     //online
 }elseif($status === false){
     //offline

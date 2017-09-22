@@ -220,13 +220,13 @@ class SignServerStats extends PluginBase{
 	 * @internal
 	 *
 	 * WARNING: Do not use this function. Use @link{this->removeSign}!
-     *
-     * @param Vector3  $pos
-     * @param string   $levelName
-     * @param int|null $index
-     *
-     * @return bool $foundSign
-     */
+	 *
+	 * @param Vector3  $pos
+	 * @param string   $levelName
+	 * @param int|null $index
+	 *
+	 * @return bool $foundSign
+	 */
 	public function internalRemoveSign(Vector3 $pos, string $levelName, ?int $index = null): bool{
 		if($index === null){
 			$foundSign = $this->doesSignExist($pos, $levelName, $index);

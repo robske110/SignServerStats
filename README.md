@@ -12,7 +12,7 @@ Anyone with the permission `SSS.signs` can create a sign with the following cont
 
 The plugin will recognize that sign and fill it with colorful stats!
 
-*Note: Due to 1.1 not telling the server when the sign is finished, you need to tap the sign once to activate it after setting it up.*
+*Note: Due to 1.1+ not telling the server when the sign is finished, you now need to tap the sign once to activate it after setting it up.*
 
 ### API:
 **This plugin can also be used as a query API. You might want to look into SignServerStats.php, because all the API functions are in there.**
@@ -21,8 +21,8 @@ Example plugins are provided in /examples/:
 - DumpInfo.php - Dumps all available info about a server.
 
 Because the following two examples may also be useful for users, so they are also provided as phars in every release:
-- WarnOffline/ - Warns if a server has gone offline. Depends on StatusList (BETA)
-- StatusList/ - Lists online status and player count of multiple servers in a List. (BETA)
+- WarnOffline/ - Warns if a server has gone offline. Depends on StatusList.
+- StatusList/ - Lists online status and player count of multiple servers in a List.
 
 _You should always check if your plugin is compatible with the version of StatusList present on the current server with the help of the isCompatible function_
 
@@ -36,12 +36,12 @@ if(!$signServerStats->isCompatible("1.0.0")){
 }
 ```
 
-#### If you prefer just a quick introduction, here is one for getting the the online status of the server `someip.com:1234`:
+#### If you prefer just a quick introduction, here is one for getting the the online status of the server `example.com:1234`:
 
 Initial, for example onEnable:
 ```php
 /** @var $sss robske_110\SSS\SignServerStats */
-$sss->addServer("someip.com", 1234);
+$sss->addServer("example.com", 1234);
 ```
 This tells SSS that it should query that server in its next query.
 
@@ -51,9 +51,9 @@ To check if the server is online simply do this, it is recommended to do this in
 ```php
 /** @var $sss robske_110\SSS\SignServerStats */
 $serverOnlineArray = $sss->getServerOnline();
-if(isset($serverOnlineArray["someip.com"."@".'1234'])){
-	$isOnline = $serverOnlineArray["someip.com"."@".'1234'];
-    //isOnline is now a bool (true/false) that reflects the online state of the server (if the server is online and this says false, it probably doesn't have query enabled)
+if(isset($serverOnlineArray["example.com"."@".1234])){
+	$isOnline = $serverOnlineArray["example.com"."@".1234];
+    //isOnline is now a bool (true/false) that reflects the online state of the server (if the server is online and this says false, it probably doesn't have query enabled.)
     //You can now also get additional data with getMODTs() and getPlayerData() in the same way.
 }else{
     //You didn't wait long enough, the information didn't get here yet...
