@@ -24,9 +24,10 @@ before_script:
  - echo | pecl install channel://pecl.php.net/yaml-2.0.2
  - git clone --recursive https://github.com/pmmp/PocketMine-MP.git --depth=1
  - cd PocketMine-MP
+ - composer install
  - mkdir plugins
  - cd plugins
- - wget -O DevTools.phar https://poggit.pmmp.io/r/10317/PocketMine-DevTools.phar
+ - wget -O DevTools.phar https://jenkins.pmmp.io/job/PocketMine-MP/lastSuccessfulBuild/artifact/DevTools.phar
  - cd /home/travis/build/robske110/SignServerStats/
  - cp -rf Travis.php PocketMine-MP/
  - cd PocketMine-MP
