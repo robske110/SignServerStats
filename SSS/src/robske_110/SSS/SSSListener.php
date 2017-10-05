@@ -86,35 +86,51 @@ class SSSListener implements Listener{
 			$signTile = $player->getLevel()->getTile($block);
 			if($signTile instanceof Sign){
 				$sign = $signTile->getText();
-				if($sign[0]=='[SSS]'){
+				if($sign[0] == '[SSS]'){
+					$address = null;
+					$port = null;
 					if($this->main->isAdmin($player)){
 						if(!empty($sign[1])){
 							if(!empty($sign[2])){
-								if(is_numeric($sign[2])){
-									$levelName = $block->getLevel()->getFolderName();
-									$this->main->addSign($sign[1], $sign[2], $block, $levelName);
-									$this->main->recalcdRSvar();
-									$signTile->setText(...$this->main->calcSign([$sign[1], $sign[2]]));
-									$this->sendSSSmessage(
-										$player,
-										TF::GREEN."The ServerStats Sign for the Server ".
-										TF::DARK_GRAY.$sign[1].TF::GRAY.":".TF::DARK_GRAY.$sign[2].TF::GREEN.
-										" has been set up correctly!"
-									);
+								if($sign[1]{strlen($sign[1]) - 1} == "-"){
+									if(!empty($sign[3])){
+										if(is_numeric($sign[3])){
+											$address = substr($sign[1], 0, strlen($sign[1]) - 1).$sign[2];
+											$port = $sign[3];
+										}else{
+											$this->sendSSSmessage($player, TF::RED."Port must be a number! (Line 4)");
+										}
+									}else{
+										$this->sendSSSmessage($player, TF::RED."Port is missing! (Line 4)");
+									}
+								}elseif(is_numeric($sign[2])){
+									$address = $sign[1];
+									$port = $sign[2];
 								}else{
 									$this->sendSSSmessage($player, TF::RED."Port must be a number! (Line 3)");
-									$signTile->setLine(0,"[BROKEN]");
 								}
 							}else{
 								$this->sendSSSmessage($player, TF::RED."Port is missing! (Line 3)");
-								$signTile->setLine(0,"[BROKEN]");
 							}
 						}else{
 							$this->sendSSSmessage($player, TF::RED."[SSS] IP is missing. (Line 2)");
-							$signTile->setLine(0,"[BROKEN]");
 						}
 					}else{
 						$this->sendSSSmessage($player, TF::RED."You are not allowed to do that!");
+					}
+					if($address === null || $port === null){
+						$signTile->setLine(0,"[BROKEN]");
+					}else{
+						$levelName = $block->getLevel()->getFolderName();
+						$this->main->addSign($address, $port, $block, $levelName);
+						$this->main->recalcdRSvar();
+						$signTile->setText(...$this->main->calcSign([$address, $port]));
+						$this->sendSSSmessage(
+							$player,
+							TF::GREEN."The ServerStats Sign for the Server ".
+							TF::DARK_GRAY.$address.TF::GRAY.":".TF::DARK_GRAY.$port.TF::GREEN.
+							" has been set up correctly!"
+						);
 					}
 				}
 			}
