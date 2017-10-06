@@ -45,18 +45,19 @@ $sss->addServer("example.com", 1234);
 ```
 This tells SSS that it should query that server in its next query.
 
-**IMPORTANT: You have to wait until the information is fetched asynchronously.**
+**IMPORTANT: The info might not be availible in the next SSSasyncUpdateEvent!**
 
-To check if the server is online simply do this, it is recommended to do this in a task.
+To check if the server is online simply listen to the SSSasyncUpdateEvent and check the array:
 ```php
-/** @var $sss robske_110\SSS\SignServerStats */
-$serverOnlineArray = $sss->getServerOnline();
-if(isset($serverOnlineArray["example.com"."@".1234])){
-	$isOnline = $serverOnlineArray["example.com"."@".1234];
-    //isOnline is now a bool (true/false) that reflects the online state of the server (if the server is online and this says false, it probably doesn't have query enabled.)
-    //You can now also get additional data with getMODTs() and getPlayerData() in the same way.
-}else{
-    //You didn't wait long enough, the information didn't get here yet...
+public function onSSSasyncUpdate(robske_110\SSS\event\SSSasyncUpdateEvent $event){
+	$serverOnlineArray = $event->getPlugin()->getServerOnline();
+	if(isset($serverOnlineArray["example.com"."@".1234])){
+		$isOnline = $serverOnlineArray["example.com"."@".1234];
+	    //isOnline is now a bool (true/false) that reflects the online state of the server (if the server is online and this says false, it probably doesn't have query enabled.)
+	    //You can now also get additional data with getMODTs() and getPlayerData() in the same way.
+	}else{
+	    //The information is going to be here in the next event!
+	}
 }
 ```
 
@@ -64,10 +65,12 @@ if(isset($serverOnlineArray["example.com"."@".1234])){
 
 - [x] Multi-line server hostnames
 
-- [ ] Make plugin event onAsyncUpdate for easier API use
+- [x] Create custom event onAsyncUpdate for easier API use
 
 - [ ] API should be able to also get other data (playernamelist, pluginlist)
 
 - [ ] Sign style config
+
+- [ ] FTPs?
 
 - [x] Tap sign to transfer

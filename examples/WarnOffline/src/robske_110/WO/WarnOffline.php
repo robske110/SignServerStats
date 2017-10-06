@@ -9,8 +9,8 @@ class WarnOffline extends PluginBase{
 		
 	const SL_API_VERSION = "1.0.0";
 		
-	/** @var WarnTask */
-	private $warnTask;
+	/** @var WarnNotifier */
+	private $warnNotifier;
 	
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
@@ -26,8 +26,8 @@ class WarnOffline extends PluginBase{
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
-		$this->warnTask = new WarnTask($this);
-		$this->getServer()->getScheduler()->scheduleRepeatingTask($this->warnTask, 20);
+		$this->warnNotifier = new WarnNotifier($this);
+		$this->server->getPluginManager()->registerEvents($this->warnNotifier, $this);
 	}
 	
     /**

@@ -280,7 +280,6 @@ class SignServerStats extends PluginBase{
 	 */
 	public function asyncTaskCallBack($data, $scheduleTime){
 		$this->asyncTaskIsRunning = false;
-		$this->lastRefreshTick = $scheduleTime;
 		if($this->debug){
 			$this->getLogger()->debug("AsyncTaskResponse:");
 			var_dump($data);
@@ -299,6 +298,9 @@ class SignServerStats extends PluginBase{
 			}
 		}
 		$this->doSignRefresh();
+		$this->server->getPluginManager()->callEvent(new SSSasyncUpdateEvent($this, $this->lastRefreshTick, $scheduleTime));
+		$this->lastRefreshTick = $scheduleTime;
+		
 		$currTick = $this->server->getTick();
 		if($currTick - $scheduleTime >= $this->signServerStatsCfg->get('SSSAsyncTaskCall')){
 			$this->startAsyncTask($currTick);

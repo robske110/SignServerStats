@@ -1,19 +1,19 @@
 <?php
 namespace robske_110\WO;
 
-use pocketmine\scheduler\PluginTask;
+use pocketmine\event\Listener;
+use robske_110\SSS\event\SSSasyncUpdateEvent;
 use pocketmine\utils\TextFormat as TF;
 
-class WarnTask extends PluginTask{
+class WarnNotifier implements Listener{
 	private $plugin;
 	private $watchServers = []; //[string $index => ?bool $online]
 	
 	public function __construct(WarnOffline $plugin){
-		parent::__construct($plugin);
 		$this->plugin = $plugin;
 	}
 	
-	public function onRun(int $currentTick){
+	public function onSSSasyncUpdate(SSSasyncUpdateEvent $event){
 		if(($sl = $this->plugin->getSL()) === null){
 			$this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
 			return;
