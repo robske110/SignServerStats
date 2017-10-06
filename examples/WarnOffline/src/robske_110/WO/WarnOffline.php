@@ -2,12 +2,14 @@
 namespace robske_110\WO;
 
 use robske_110\SL\StatusList;
+use robske_110\SSS\SignServerStats;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat as TF;
 
 class WarnOffline extends PluginBase{
-		
+	
 	const SL_API_VERSION = "1.0.0";
+	const SSS_API_VERSION = "1.1.0";
 		
 	/** @var WarnNotifier */
 	private $warnNotifier;
@@ -26,8 +28,14 @@ class WarnOffline extends PluginBase{
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
+		if(!$this->getServer()->getPluginManager()->getPlugin("SignServerStats")->isCompatible(self::SSS_API_VERSION)){
+			$newOld = version_compare(self::SSS_API_VERSION, SignServerStats::API_VERSION, ">") ? "old" : "new";
+			$this->getLogger()->critical("Your version of SignServerStats is too ".$newOld." for this plugin.");
+			$this->getServer()->getPluginManager()->disablePlugin($this);
+			return;
+		}
 		$this->warnNotifier = new WarnNotifier($this);
-		$this->server->getPluginManager()->registerEvents($this->warnNotifier, $this);
+		$this->getServer()->getPluginManager()->registerEvents($this->warnNotifier, $this);
 	}
 	
     /**

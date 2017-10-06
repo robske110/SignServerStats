@@ -15,6 +15,7 @@ use pocketmine\utils\TextFormat as TF;
 use pocketmine\Server;
 use pocketmine\plugin\PluginBase;
 use pocketmine\tile\Sign;
+use robske_110\SSS\event\SSSasyncUpdateEvent;
 
 /* _____ _____ _____ 
   / ____/ ____/ ____|
