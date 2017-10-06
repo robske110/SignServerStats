@@ -62,12 +62,12 @@ if(isset($serverOnlineArray["example.com"."@".1234])){
 
 ## TODO:
 
+- [x] Multi-line server hostnames
+
 - [ ] Make plugin event onAsyncUpdate for easier API use
 
 - [ ] API should be able to also get other data (playernamelist, pluginlist)
 
-- [ ] Multi-line server hostnames
-
 - [ ] Sign style config
 
-- [ ] Tap sign to transfer
+- [x] Tap sign to transfer

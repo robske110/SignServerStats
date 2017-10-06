@@ -11,3 +11,5 @@ permissions:
   children:
    SSS.signs:
      description: "Allows to create [SSS] signs and destroy them"
+   SSS.servertransfer:
+     description: "Allows to click on a SSSign and get transfered to that server."

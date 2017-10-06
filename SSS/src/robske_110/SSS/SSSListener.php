@@ -17,6 +17,7 @@ use pocketmine\Server;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 use pocketmine\block\BlockIds;
+use pocketmine\scheduler\PluginTask;
 
 class SSSListener implements Listener{
 	private $main;
@@ -85,6 +86,39 @@ class SSSListener implements Listener{
 			$player = $event->getPlayer();
 			$signTile = $player->getLevel()->getTile($block);
 			if($signTile instanceof Sign){
+				$levelName = $block->getLevel()->getFolderName();
+				$id = null;
+				if($this->main->doesSignExist($block, $levelName, $id)){
+					if($player->hasPermission("SSS.servertransfer")){
+						$address = $this->main->getSignList()[$id][1];
+						$this->main->getServer()->getScheduler()->scheduleDelayedTask(
+							new class($this->main, $player, $address[0], $address[1], $id) extends PluginTask{
+								/** @var Player */
+								private $player;
+								/** @var string */
+								private $ip;
+								/** @var int */
+								private $port;
+								/** @var int */
+								private $id;
+									
+								public function __construct(SignServerStats $plugin, Player $player, string $ip, int $port, int $id){
+									parent::__construct($plugin);
+									$this->player = $player;
+									$this->ip = $ip;
+									$this->port = $port;
+									$this->id = $id;
+								}
+	
+								public function onRun(int $currentTick){
+									$this->player->transfer($this->ip, $this->port, "SSStransfer/".implode("@", [$this->id, $this->ip, $this->port]));
+								}
+							},
+							1
+						);
+					}
+					return;
+				}
 				$sign = $signTile->getText();
 				if($sign[0] == '[SSS]'){
 					$address = null;
@@ -121,7 +155,6 @@ class SSSListener implements Listener{
 					if($address === null || $port === null){
 						$signTile->setLine(0,"[BROKEN]");
 					}else{
-						$levelName = $block->getLevel()->getFolderName();
 						$this->main->addSign($address, $port, $block, $levelName);
 						$this->main->recalcdRSvar();
 						$signTile->setText(...$this->main->calcSign([$address, $port]));

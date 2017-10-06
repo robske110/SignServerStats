@@ -54,7 +54,7 @@ class SignServerStats extends PluginBase{
 	/** @var array */
 	private $asyncTaskIsOnline = [];
 	
-	const API_VERSION = "1.0.0";
+	const API_VERSION = "1.1.0";
 	
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
@@ -130,6 +130,13 @@ class SignServerStats extends PluginBase{
 	 */
 	public function getPlayerData(): array{
 		return $this->asyncTaskPlayers;
+	}
+	
+	/**
+	 * @return array [int $signID => [[int $x, int $y, int $z, string $levelName], [string $ip, int $port]]]
+	 */
+	public function getSignList(): array{
+		return $this->doRefreshSigns;
 	}
 	
 	/**
@@ -304,11 +311,11 @@ class SignServerStats extends PluginBase{
 	public function doSignRefresh(){
 		foreach($this->doRefreshSigns as $signData){
 			$pos = $signData[0];
-			$adress = $signData[1];
+			$address = $signData[1];
 			if($this->server->loadLevel($pos[3])){
 				$signTile = $this->server->getLevelByName($pos[3])->getTile(new Vector3($pos[0], $pos[1], $pos[2]));
 				if($signTile instanceof Sign){
-					$lines = $this->calcSign($adress);
+					$lines = $this->calcSign($address);
 					$signTile->setText($lines[0],$lines[1],$lines[2],$lines[3]);
 				}else{
 					$this->server->broadcast(
