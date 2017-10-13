@@ -57,11 +57,25 @@ class SignServerStats extends PluginBase{
 	
 	const API_VERSION = "1.1.0";
 	
+	const DEFAULT_STYLES = [
+		"sign.unknown.playercount" => "- / -",
+		"sign.known.playercount" => "%DARK_GREEN%%currPlayers%%WHITE%/%GOLD%%maxPlayers%",
+		"sign.offline.line1" => "%DARK_RED%Offline",
+		"sign.offline.line2" => "IP: %GREEN%%ip%",
+		"sign.offline.line3" => "Port: %DARK_GREEN%%port%",
+		"sign.offline.line4" => "%playercount%",
+		"sign.online.line1" => "%modt%",
+		"sign.online.line2" => "IP: %GREEN%%ip%",
+		"sign.online.line3" => "Port: %DARK_GREEN%%port%",
+		"sign.online.line4" => "%playercount%",
+		"variableSeperator" => "%"
+	];
+	
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
 		$this->server = $this->getServer();
-		$this->db = new Config($this->getDataFolder() . "SignServerStatsDB.yml", Config::YAML, []); //TODO:betterDB
-		$this->signServerStatsCfg = new Config($this->getDataFolder() . "SSSconfig.yml", Config::YAML, []);
+		$this->db = new Config($this->getDataFolder()."SignServerStatsDB.yml", Config::YAML, []); //TODO:betterDB
+		$this->signServerStatsCfg = new Config($this->getDataFolder()."SSSconfig.yml", Config::YAML, []);
 		if($this->signServerStatsCfg->get("ConfigVersion") != 3){
 			$this->signServerStatsCfg->set('async-task-call-ticks', 200);
 			$this->signServerStatsCfg->set('always-start-async-task', false);
@@ -73,6 +87,7 @@ class SignServerStats extends PluginBase{
 		if($this->signServerStatsCfg->get('debug')){
 			$this->debug = true;
 		}
+		$this->formatCfg = new Config($this->getDataFolder()."SSSstyles.yml", Config::YAML, self::DEFAULT_STYLES);
 		$this->listener = new SSSListener($this);
 		$this->server->getPluginManager()->registerEvents($this->listener, $this);
 		$this->doRefreshSigns = $this->db->getAll();
@@ -354,6 +369,15 @@ class SignServerStats extends PluginBase{
 		}
 	}
 	
+	public function parseStyle(string $styleID, array $vars): string{
+		$varSep = $this->styleCfg->get("variableSeperator");
+		$str = $this->styleCfg->get($styleID);
+		foreach($vars as $name => $value){
+			$str = str_replace($varSep.$name.$varSep, $value, $str);
+		}
+		return $str;
+	}
+	
 	/**
 	 * @internal
 	 *
@@ -367,28 +391,33 @@ class SignServerStats extends PluginBase{
 		if(isset($this->asyncTaskIsOnline[$ip."@".$port])){
 			$isOnline = $this->asyncTaskIsOnline[$ip."@".$port];
 			if($isOnline){
-				$MODT = $this->asyncTaskMODTs[$ip."@".$port];
-				$playerData = $this->asyncTaskPlayers[$ip."@".$port];
-				$currentPlayers = $playerData[0];
-				$maxPlayers = $playerData[1];
-				$lines[0] = $MODT ?? TF::DARK_RED."ERROR";
-				$lines[1] = "IP: ".TF::GREEN.$ip;
-				$lines[2] = "Port: ".TF::DARK_GREEN.$port;
-				$lines[3] = TF::DARK_GREEN.($currentPlayers ?? "-").TF::WHITE."/".TF::GOLD.($maxPlayers ?? "-");
+				$vars = [
+					"ip" => $ip,
+					"port" => $port,
+					"modt" => $this->asyncTaskMODTs[$ip."@".$port] ?? TF::DARK_RED."ERROR",
+					"playerData" => $this->asyncTaskPlayers[$ip."@".$port],
+					"playerCnt" => $this->parseStyle('sign.known.playercount', [
+						'currPlayers' => $playerData[0] ?? "-",
+						'maxPlayers' => $playerData[1] ?? "-"
+					])
+				];
+				
+				for($line = 0; $line < 4; $line++){
+					$lines[$line] = $this->parseStyle("sign.online.line".($line + 1), $vars);
+				}
 			}else{
 				$lines[0] = TF::DARK_RED."Offline";
 				$lines[1] = "IP: ".TF::GREEN.$ip;
 				$lines[2] = "Port: ".TF::DARK_GREEN.$port;
-				$lines[3] = "-"." / "."-";
+				$lines[3] = "- / -";
 			}
 		}else{ //If this happens a new Sign has been added and the AsyncTask hasn't returned the data for it yet!
 			$lines[0] = TF::GOLD."Loading...";
 			$lines[1] = "IP: ".TF::GREEN.$ip;
 			$lines[2] = "Port: ".TF::DARK_GREEN.$port;
-			$lines[3] = "-"." / "."-";
+			$lines[3] = "- / -";
 		}
 		return $lines;
 	}
-	
 }
 //Theory is when you know something, but it doesn"t work. Practice is when something works, but you don"t know why. Programmers combine theory and practice: Nothing works and they don"t know why!
