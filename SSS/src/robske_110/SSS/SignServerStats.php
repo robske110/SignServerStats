@@ -25,13 +25,16 @@ use robske_110\SSS\event\SSSasyncUpdateEvent;
  |_____/_____/_____/ 
 */
 class SignServerStats extends PluginBase{
-    /** @var SSSListener */
-	private $listener;
-
 	/** @var Config */
 	private $signServerStatsCfg;
 	/** @var Config */
+	private $styleCfg;
+	
+	/** @var Config */
 	private $db;
+
+    /** @var SSSListener */
+	private $listener;
 
 	/** @var Server */
 	private $server;
@@ -60,14 +63,18 @@ class SignServerStats extends PluginBase{
 	const DEFAULT_STYLES = [
 		"sign.unknown.playercount" => "- / -",
 		"sign.known.playercount" => "%DARK_GREEN%%currPlayers%%WHITE%/%GOLD%%maxPlayers%",
-		"sign.offline.line1" => "%DARK_RED%Offline",
-		"sign.offline.line2" => "IP: %GREEN%%ip%",
-		"sign.offline.line3" => "Port: %DARK_GREEN%%port%",
-		"sign.offline.line4" => "%playercount%",
 		"sign.online.line1" => "%modt%",
 		"sign.online.line2" => "IP: %GREEN%%ip%",
 		"sign.online.line3" => "Port: %DARK_GREEN%%port%",
 		"sign.online.line4" => "%playercount%",
+		"sign.offline.line1" => "%DARK_RED%Offline",
+		"sign.offline.line2" => "IP: %GREEN%%ip%",
+		"sign.offline.line3" => "Port: %DARK_GREEN%%port%",
+		"sign.offline.line4" => "%playercount%",
+		"sign.loading.line1" => "%GOLD%Loading...",
+		"sign.loading.line2" => "IP: %GREEN%%ip%",
+		"sign.loading.line3" => "Port: %DARK_GREEN%%port%",
+		"sign.loading.line4" => "%playercount%",
 		"variableSeperator" => "%"
 	];
 	
@@ -87,7 +94,7 @@ class SignServerStats extends PluginBase{
 		if($this->signServerStatsCfg->get('debug')){
 			$this->debug = true;
 		}
-		$this->formatCfg = new Config($this->getDataFolder()."SSSstyles.yml", Config::YAML, self::DEFAULT_STYLES);
+		$this->styleCfg = new Config($this->getDataFolder()."SSSstyles.yml", Config::YAML, self::DEFAULT_STYLES);
 		$this->listener = new SSSListener($this);
 		$this->server->getPluginManager()->registerEvents($this->listener, $this);
 		$this->doRefreshSigns = $this->db->getAll();
@@ -369,9 +376,12 @@ class SignServerStats extends PluginBase{
 		}
 	}
 	
-	public function parseStyle(string $styleID, array $vars): string{
+	private function parseStyle(string $styleID, array $vars): string{
 		$varSep = $this->styleCfg->get("variableSeperator");
 		$str = $this->styleCfg->get($styleID);
+		foreach((new \ReflectionClass(TF::class))->getConstants() as $name => $value){
+			$vars[$name] = $value;
+		}
 		foreach($vars as $name => $value){
 			$str = str_replace($varSep.$name.$varSep, $value, $str);
 		}
@@ -388,15 +398,20 @@ class SignServerStats extends PluginBase{
 	public function calcSign(array $address): array{
 		$ip = $address[0];
 		$port = $address[1];
+		$vars = [
+			"ip" => $ip,
+			"port" => $port,
+			"playercount" => $this->styleCfg->get('sign.unknown.playercount')
+		];
 		if(isset($this->asyncTaskIsOnline[$ip."@".$port])){
 			$isOnline = $this->asyncTaskIsOnline[$ip."@".$port];
 			if($isOnline){
+				$playerData = $this->asyncTaskPlayers[$ip."@".$port];
 				$vars = [
 					"ip" => $ip,
 					"port" => $port,
 					"modt" => $this->asyncTaskMODTs[$ip."@".$port] ?? TF::DARK_RED."ERROR",
-					"playerData" => $this->asyncTaskPlayers[$ip."@".$port],
-					"playerCnt" => $this->parseStyle('sign.known.playercount', [
+					"playercount" => $this->parseStyle('sign.known.playercount', [
 						'currPlayers' => $playerData[0] ?? "-",
 						'maxPlayers' => $playerData[1] ?? "-"
 					])
@@ -406,16 +421,14 @@ class SignServerStats extends PluginBase{
 					$lines[$line] = $this->parseStyle("sign.online.line".($line + 1), $vars);
 				}
 			}else{
-				$lines[0] = TF::DARK_RED."Offline";
-				$lines[1] = "IP: ".TF::GREEN.$ip;
-				$lines[2] = "Port: ".TF::DARK_GREEN.$port;
-				$lines[3] = "- / -";
+				for($line = 0; $line < 4; $line++){
+					$lines[$line] = $this->parseStyle("sign.offline.line".($line + 1), $vars);
+				}
 			}
 		}else{ //If this happens a new Sign has been added and the AsyncTask hasn't returned the data for it yet!
-			$lines[0] = TF::GOLD."Loading...";
-			$lines[1] = "IP: ".TF::GREEN.$ip;
-			$lines[2] = "Port: ".TF::DARK_GREEN.$port;
-			$lines[3] = "- / -";
+			for($line = 0; $line < 4; $line++){
+				$lines[$line] = $this->parseStyle("sign.loading.line".($line + 1), $vars);
+			}
 		}
 		return $lines;
 	}

@@ -69,7 +69,7 @@ public function onSSSasyncUpdate(robske_110\SSS\event\SSSasyncUpdateEvent $event
 
 - [ ] API should be able to also get other data (playernamelist, pluginlist)
 
-- [ ] Sign style config
+- [x] Sign style config
 
 - [ ] FTPs?
 
