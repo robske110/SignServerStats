@@ -52,6 +52,8 @@ class SignServerStats extends PluginBase{
 	/** @var array */
 	private $doRefreshSigns = [];
 	/** @var array */
+	private $asyncTaskFullData = [];
+	/** @var array */
 	private $asyncTaskMODTs = [];
 	/** @var array */
 	private $asyncTaskPlayers = [];
@@ -139,6 +141,15 @@ class SignServerStats extends PluginBase{
 	 */
 	public function getServerOnline(): array{
 		return $this->asyncTaskIsOnline;
+	}
+	
+	/**
+	 * Returns the full queryResponse
+	 *
+	 * @return array [string $serverID => array $queryResponse]
+	 */
+	public function getFullData(): array{
+		return $this->asyncTaskFullData;
 	}
 	
 	/**
@@ -314,10 +325,11 @@ class SignServerStats extends PluginBase{
 			return;
 		}
 		foreach($data as $serverID => $serverData){
-			$this->asyncTaskIsOnline[$serverID] = $serverData[2];
-			if($serverData[2]){
-				$this->asyncTaskMODTs[$serverID] = $serverData[1];
-				$this->asyncTaskPlayers[$serverID] = $serverData[0];
+			$this->asyncTaskIsOnline[$serverID] = $serverData[0];
+			if($serverData[0]){
+				$this->asyncTaskMODTs[$serverID] = $serverData[2];
+				$this->asyncTaskPlayers[$serverID] = $serverData[1];
+				$this->asyncTaskFullData[$serverID] = $serverData[3];
 			}
 		}
 		$this->doSignRefresh();

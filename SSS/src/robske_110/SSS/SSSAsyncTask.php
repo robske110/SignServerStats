@@ -37,9 +37,6 @@ class SSSAsyncTask extends AsyncTask{
 	 * @return array
 	 */
 	private function doQuery(string $ip, int $port, array $timeout): array{
-  	  if($this->debug){
-  	  	echo("doQuery:\n");
-  	  }
       $sock = @fsockopen("udp://".$ip, $port);
       if(!$sock){return [-1, NULL];}
       socket_set_timeout($sock, $timeout[0], $timeout[1]);
@@ -59,25 +56,26 @@ class SSSAsyncTask extends AsyncTask{
       for($x = 0; $x < 2; $x++){
           $response[] = @fread($sock, 2048);
       }
-	  if($this->debug){
-	      var_dump($response);
-      }
       $response = implode($response);
       $response = substr($response, 16);
       $response = explode("\0", $response);
-	  if($this->debug){
-	  	  var_dump($response);
+	  for($x = 0; $x < 2; $x++){
+	      array_pop($response);
 	  }
-      array_pop($response);
-      array_pop($response);
-      array_pop($response);
-      array_pop($response);
       $return = [];
-	  if($this->debug){
-		  var_dump($response);
-      }
 	  $type = true;
+	  $players = false;
       foreach($response as $key){
+		  if(strpos($key, "player_") !== false){
+			  $players = true;
+			  continue;
+		  }
+		  if($players){
+			  if($key !== ""){
+			  	$return["players"][] = $key;
+			  }
+			  continue;
+		  }
           if($type) $val = $key;
           if(!$type) $return[$val] = $key;
           $type = !$type;
@@ -105,18 +103,21 @@ class SSSAsyncTask extends AsyncTask{
 		  if($this->debug){
 		    echo("returnState:\n");
 		  	var_dump($return[0]);
+			echo("queryResult:\n");
+			var_dump($queryResult);
 		  }
 		  switch($return[0]){
 			  case -1;
-				  $serverData[2] = false;
+				  $serverData[0] = false;
 		  	  break;
 			  case 0:
-			  	  $serverData[2] = false;
+			  	  $serverData[0] = false;
 			  break;
 			  case 1:
-			      $serverData[0] = [$queryResult['numplayers'], $queryResult['maxplayers']];
-			      $serverData[1] = $queryResult['hostname'];
-				  $serverData[2] = true;
+			  	  $serverData[0] = true;
+			      $serverData[1] = [$queryResult['numplayers'], $queryResult['maxplayers']];
+			      $serverData[2] = $queryResult['hostname'];
+				  $serverData[3] = $queryResult;
 		  }
 		  $serverFINALdata[$ip."@".$port] = $serverData;
 	  }

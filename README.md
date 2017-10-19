@@ -67,7 +67,7 @@ public function onSSSasyncUpdate(robske_110\SSS\event\SSSasyncUpdateEvent $event
 
 - [x] Create custom event onAsyncUpdate for easier API use
 
-- [ ] API should be able to also get other data (playernamelist, pluginlist)
+- [x] API should be able to also get other data (playernamelist, pluginlist)
 
 - [x] Sign style config
 

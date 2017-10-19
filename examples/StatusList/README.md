@@ -6,7 +6,7 @@ A PocketMine plugin depending on SignServerStats which displays a list of server
 Anyone with the permission `StatusList.seeList` can use the command `statuslist show` to prompt a response which will look like this:
 ```
 All StatusList servers:
-robskebueba.no-ip.biz:3114 | ONLINE
+robskebueba.no-ip.biz:3114 | ONLINE (5/50)
 pe.cuboss.net:19132 | OFFLINE
 FallenTech.tk:19132 | ONLINE
 ecpehub.net:19132 | LOADING
