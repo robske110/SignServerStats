@@ -77,7 +77,7 @@ class SignServerStats extends PluginBase{
 		"sign.loading.line2" => "IP: %GREEN%%ip%",
 		"sign.loading.line3" => "Port: %DARK_GREEN%%port%",
 		"sign.loading.line4" => "%playercount%",
-		"variableSeperator" => "%"
+		"variableSeparator" => "%"
 	];
 	
 	public function onEnable(){
@@ -389,7 +389,7 @@ class SignServerStats extends PluginBase{
 	}
 	
 	private function parseStyle(string $styleID, array $vars): string{
-		$varSep = $this->styleCfg->get("variableSeperator");
+		$varSep = $this->styleCfg->get("variableSeparator");
 		$str = $this->styleCfg->get($styleID);
 		foreach((new \ReflectionClass(TF::class))->getConstants() as $name => $value){
 			$vars[$name] = $value;

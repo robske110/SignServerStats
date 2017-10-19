@@ -1,8 +1,7 @@
 # StatusList
 A PocketMine plugin depending on SignServerStats which displays a list of servers in chat/console with their online Status associated with them.
 
-## Info:
-### Usage:
+## Usage:
 Anyone with the permission `StatusList.seeList` can use the command `statuslist show` to prompt a response which will look like this:
 ```
 All StatusList servers:
@@ -15,8 +14,8 @@ Total: 4 Online: 2 Offline: 1 Last Refresh: 13.7s ago
 
 Anyone with the permission `StatusList.manageList` can use the command `statuslist add <ip> [port]` or `statuslist add <ip> [port]` to add/remove a server.
 
-### API:
-**This plugin provides an API which can temporarily or permanently add or remove Servers to/from the StatusList and get online information from all StatusServers**
+## API:
+**This plugin provides an API which can temporarily or permanently add or remove Servers to/from the StatusList and get online&playercount information from all StatusServers**
 
 _You should always check if your plugin is compatible with the version of StatusList present on the current server with the help of the isCompatible function_
 
@@ -30,6 +29,8 @@ if(!$statusList->isCompatible("1.0.0")){
 }
 ```
 #### Some examples of API usage:
+There is an example plugin in /examples/WarnOffline/ which warns if a server from StatusList has gone offline, showcasing most of this plugin's API.
+
 Adding the server `someip.com:1234` temporarily to the StatusList:
 ```php
 /** @var $sl robske_110\SL\StatusList */
