@@ -91,6 +91,9 @@ class SSSListener implements Listener{
 				if($this->main->doesSignExist($block, $levelName, $id)){
 					if($player->hasPermission("SSS.servertransfer")){
 						$address = $this->main->getSignList()[$id][1];
+						if(!$this->main->getServerOnline()[$address[0]."@".$address[1]]){
+							return;
+						}
 						$this->main->getServer()->getScheduler()->scheduleDelayedTask(
 							new class($this->main, $player, $address[0], $address[1], $id) extends PluginTask{
 								/** @var Player */
