@@ -77,11 +77,18 @@ class StatusListManager{
 			return true;
 		}
 		$serverOnlineArray = $sss->getServerOnline();
+		$playerOnlineArray = $sss->getPlayerData();
 		foreach($this->listServers as $index => $listServer){
 			if(isset($serverOnlineArray[$index])){
 		    	$this->listServers[$index][2] = $serverOnlineArray[$index];
+				if(isset($playerOnlineArray[$index])){
+					$this->listServers[$index][3] = $playerOnlineArray[$index];
+				}else{
+					$this->listServers[$index][3] = null;
+				}
 			}else{
 				$this->listServers[$index][2] = null;
+				$this->listServers[$index][3] = null;
 			}
 		}
 		$this->dataRefreshTick = $lastRefreshTick;

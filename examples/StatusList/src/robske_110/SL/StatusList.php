@@ -157,7 +157,7 @@ class StatusList extends PluginBase{
 					return true;
 				}
 			break;
-			case "statuslist show": //I personally hate the "pages" approach, MCPE and almost all terminals/ssh/rcon clients have scrollbars.
+			case "statuslist show": //I personally hate plugins with "pages", MCPE and almost all terminals/ssh/rcon clients have scrollbars. No Pages for you!
 					$sender->sendMessage(TF::GREEN."All StatusList servers:");
 					$listServers = $this->statusListManager->getStatusServers();
 					$onlineCnt = 0;
@@ -170,7 +170,12 @@ class StatusList extends PluginBase{
 						}
 						$sender->sendMessage(
 							TF::DARK_GRAY.$listServer[0].TF::GRAY.":".TF::DARK_GRAY.$listServer[1].TF::GRAY." | ".
-							($listServer[2] === true ? TF::GREEN."ONLINE" : ($listServer[2] === false ? TF::DARK_RED."OFFLINE" : TF::GRAY."LOADING"))
+							(
+								$listServer[2] === true ?
+								TF::GREEN."ONLINE ".TF::GRAY."(".TF::DARK_GRAY.$listServer[3][0].
+								TF::GRAY."/".TF::DARK_GRAY.$listServer[3][1].TF::GRAY.")":
+								($listServer[2] === false ? TF::DARK_RED."OFFLINE" : TF::GRAY."LOADING")
+							)
 						);
 					}
 					
