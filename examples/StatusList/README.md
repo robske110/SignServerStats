@@ -24,7 +24,7 @@ Example:
 ```php
 /** @var robske_110\SL\StatusList $statusList */
 if(!$statusList->isCompatible("1.0.0")){
-   	$this->getLogger()->critical("Your version of StatusList is not compatible with this plugin);
+   	$this->getLogger()->critical("Your version of StatusList is not compatible with this plugin");
 	$this->getServer()->getPluginManager()->disablePlugin($this);
 	return;
 }

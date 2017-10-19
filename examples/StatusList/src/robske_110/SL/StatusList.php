@@ -11,7 +11,7 @@ use pocketmine\utils\TextFormat as TF;
 class StatusList extends PluginBase{
 		
 	const SSS_API_VERSION = "1.0.0";
-	const API_VERSION = "1.0.0";
+	const API_VERSION = "1.1.0";
 	
 	/** @var Config */
 	private $db;

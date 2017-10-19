@@ -5,7 +5,7 @@ class StatusListManager{
 	/** @var StatusList */
 	private $plugin;
 	/** @var array */
-	private $listServers = []; //[(string) hostname, (int) port, ?bool online]
+	private $listServers = []; //[string hostname, int port, ?bool online, ?array playerCount]
 	/** @var int */
 	private $dataRefreshTick = -1;
 	

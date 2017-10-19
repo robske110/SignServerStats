@@ -63,6 +63,8 @@ public function onSSSasyncUpdate(robske_110\SSS\event\SSSasyncUpdateEvent $event
 
 ## TODO:
 
+- [ ] FTPs? NCPs?
+
 - [x] Multi-line server hostnames
 
 - [x] Create custom event onAsyncUpdate for easier API use
@@ -70,7 +72,5 @@ public function onSSSasyncUpdate(robske_110\SSS\event\SSSasyncUpdateEvent $event
 - [x] API should be able to also get other data (playernamelist, pluginlist)
 
 - [x] Sign style config
-
-- [ ] FTPs?
 
 - [x] Tap sign to transfer
