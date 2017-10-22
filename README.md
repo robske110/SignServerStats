@@ -29,7 +29,7 @@ Example:
 ```php
 /** @var robske_110\SSS\SignServerStats $signServerStats */
 if(!$signServerStats->isCompatible("1.0.0")){
-   	$this->getLogger()->critical("Your version of SignServerStats is not compatible with this plugin);
+   	$this->getLogger()->critical("Your version of SignServerStats is not compatible with this plugin.");
 	$this->getServer()->getPluginManager()->disablePlugin($this);
 	return;
 }
