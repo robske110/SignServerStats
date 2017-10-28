@@ -38,11 +38,11 @@ class SSSAsyncTask extends AsyncTask{
 	 */
 	private function doQuery(string $ip, int $port, array $timeout): array{
 		$sock = @fsockopen("udp://".$ip, $port);
-		if(!$sock){return [-1, NULL];}
+		if(!$sock){return [-1, null];}
 		socket_set_timeout($sock, $timeout[0], $timeout[1]);
-		if(!@fwrite($sock, "\xFE\xFD\x09\x10\x20\x30\x40\xFF\xFF\xFF\x01")){return [0, NULL];}
+		if(!@fwrite($sock, "\xFE\xFD\x09\x10\x20\x30\x40\xFF\xFF\xFF\x01")){return [0, null];}
 		$challenge = fread($sock, 1400);
-		if(!$challenge){return [0, NULL];}
+		if(!$challenge){return [0, null];}
 		$challenge = substr(preg_replace("/[^0-9\-]/si", "", $challenge ), 1);
 		$query = sprintf(
 			"\xFE\xFD\x00\x10\x20\x30\x40%c%c%c%c\xFF\xFF\xFF\x01",
@@ -51,7 +51,7 @@ class SSSAsyncTask extends AsyncTask{
 			($challenge >> 8),
 			($challenge >> 0)
 		);
-		if(!@fwrite($sock, $query)){return [0, NULL];}
+		if(!@fwrite($sock, $query)){return [0, null];}
 		$response = array();
 		for($x = 0; $x < 2; $x++){
 			$response[] = @fread($sock, 2048);
@@ -79,7 +79,13 @@ class SSSAsyncTask extends AsyncTask{
 			if($type) $val = $key;
 			if(!$type) $return[$val] = $key;
 			$type = !$type;
-		}	
+		}
+		$requiredKeys = ['numplayers', 'maxplayers', 'hostname'];
+		foreach($requiredKey as $requiredKey){
+			if(!isset($return[$requiredKey])){
+				return [-1, null];
+			}
+		}
 		return [1, $return];
 	}
   
