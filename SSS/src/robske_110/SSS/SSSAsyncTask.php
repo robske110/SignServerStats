@@ -81,7 +81,7 @@ class SSSAsyncTask extends AsyncTask{
 			$type = !$type;
 		}
 		$requiredKeys = ['numplayers', 'maxplayers', 'hostname'];
-		foreach($requiredKey as $requiredKey){
+		foreach($requiredKeys as $requiredKey){
 			if(!isset($return[$requiredKey])){
 				return [-1, null];
 			}
