@@ -5,8 +5,8 @@ A PocketMine plugin which can display player count and MODT on a sign from any s
 Anyone with the permission `SSS.signs` can create a sign with the following content:
 ```
 [SSS]
-<serverIP>
-<serverPort>
+serverIP/Hostname (this can go over two lines, but there must be a - at the first line)
+serverPort
 ```
 
 The plugin will recognize that sign and fill it with colorful stats!
@@ -28,7 +28,7 @@ _You should always check if your plugin is compatible with the version of Status
 Example:
 ```php
 /** @var robske_110\SSS\SignServerStats $signServerStats */
-if(!$signServerStats->isCompatible("1.0.0")){
+if(!$signServerStats->isCompatible("1.1.0")){
    	$this->getLogger()->critical("Your version of SignServerStats is not compatible with this plugin.");
 	$this->getServer()->getPluginManager()->disablePlugin($this);
 	return;

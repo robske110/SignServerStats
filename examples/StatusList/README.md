@@ -12,7 +12,7 @@ ecpehub.net:19132 | LOADING
 Total: 4 Online: 2 Offline: 1 Last Refresh: 13.7s ago
 ```
 
-Anyone with the permission `StatusList.manageList` can use the command `statuslist add <ip> [port]` or `statuslist add <ip> [port]` to add/remove a server.
+Anyone with the permission `StatusList.manageList` can use the command `statuslist add <ip> [port]` or `statuslist add <ip> [port]` to add/remove servers.
 
 ## API:
 **This plugin provides an API which can temporarily or permanently add or remove Servers to/from the StatusList and get online&playercount information from all StatusServers**
