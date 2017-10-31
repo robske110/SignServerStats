@@ -5,11 +5,12 @@ A PocketMine plugin which can display player count and MODT on a sign from any s
 Anyone with the permission `SSS.signs` can create a sign with the following content:
 ```
 [SSS]
-serverIP/Hostname (this can go over two lines, but there must be a - at the first line)
+serverIP/Hostname (can go over two lines with a - at the end of the first line)
 serverPort
 ```
 
 The plugin will recognize that sign and fill it with colorful stats!
+Players who tap the sign and have the permission `SSS.servertransfer` will be transferred to the Server the sign is displaying.
 
 *Note: Due to 1.1+ not telling the server when the sign is finished, you now need to tap the sign once to activate it after setting it up.*
 
