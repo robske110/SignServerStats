@@ -8,4 +8,6 @@ projects:
     path: examples/StatusList/
   WarnOffline:
     path: examples/WarnOffline/
+  LinkPlayerCount:
+      path: examples/LinkPlayerCount/
 ...

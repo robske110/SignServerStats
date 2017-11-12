@@ -1,6 +1,6 @@
 <?php
 $repoPath = "/home/travis/build/robske110/SignServerStats/";
-$plugins = ["SignServerStats" => ["SSS/", true], "StatusList" => ["examples/StatusList/", true], "WarnOffline" => ["examples/WarnOffline", true], "DumpInfo" => ["examples/DumpInfo.php" , false]];
+$plugins = ["SignServerStats" => ["SSS/", true], "StatusList" => ["examples/StatusList/", true], "WarnOffline" => ["examples/WarnOffline", true], "LinkPlayerCount" => ["examples/LinkPlayerCount", true], "DumpInfo" => ["examples/DumpInfo.php" , false]];
 
 foreach($plugins as $info){
 	$info[0] = $repoPath.$info[0];

@@ -23,6 +23,7 @@ Example plugins are provided in /examples/:
 Because the following two examples may also be useful for users, they are also provided as phars in every release:
 - WarnOffline/ - Warns if a server has gone offline. Depends on StatusList.
 - StatusList/ - Lists online status and player count of multiple servers in a List.
+- LinkPlayerCount/ - Links the player count of multiple servers.
 
 _You should always check if your plugin is compatible with the version of StatusList present on the current server with the help of the isCompatible function_
 
