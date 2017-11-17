@@ -14,6 +14,8 @@ class LinkPlayerCount extends PluginBase{
 	const API_VERSION = "1.0.0";
 	
 	/** @var Config */
+	private $cfg;
+	/** @var Config */
 	private $db;
 	/** @var LinkPlayerCountManager */
 	private $linkPlayerCountManager;
@@ -34,7 +36,13 @@ class LinkPlayerCount extends PluginBase{
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
-		$this->linkPlayerCountManager = new LinkPlayerCountManager($this);
+		$this->cfg = new Config($this->getDataFolder()."SSSconfig.yml", Config::YAML, []);
+		if($this->cfg->get("ConfigVersion") != 1){
+			$this->cfg->set('combine-max-slots', true);
+			$this->cfg->set('ConfigVersion', 1);
+		}
+		$this->cfg->save();
+		$this->linkPlayerCountManager = new LinkPlayerCountManager($this, (bool) $this->cfg->get("combine-max-slots"));
 		$this->getServer()->getPluginManager()->registerEvents($this->linkPlayerCountManager, $this);
 		$this->db = new Config($this->getDataFolder()."servers.yml", Config::YAML, []);
 		foreach($this->db->getAll() as $server){

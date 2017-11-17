@@ -8,15 +8,21 @@ use robske_110\SSS\event\SSSasyncUpdateEvent;
 class LinkPlayerCountManager implements Listener{
 	/** @var LinkPlayerCount */
 	private $plugin;
+	/** @var bool */
+	private $combineMaxSlots;
+	
 	/** @var array */
 	private $servers = []; //[string hostname, int port, bool hasWarned]
-	/** @var int */
-	private $playerCount;
+	/** @var int|null */
+	private $playerCount = null;
+	/** @var int|null */
+	private $playerMax = null;
 	/** @var int */
 	private $dataRefreshTick = -1;
 	
-	public function __construct(LinkPlayerCount $plugin){
+	public function __construct(LinkPlayerCount $plugin, bool $combineMaxSlots){
 		$this->plugin = $plugin;
+		$this->combineMaxSlots = $combineMaxSlots;
 	}
 	
 	/**
@@ -63,7 +69,12 @@ class LinkPlayerCountManager implements Listener{
 	}
 	
 	public function onQueryRegenerate(QueryRegenerateEvent $event){
-		$event->setPlayerCount($this->playerCount);
+		if($this->playerCount !== null){
+			$event->setPlayerCount($this->playerCount);
+		}
+		if($this->playerMax !== null){
+			$event->setMaxPlayerCount($this->playerMax);
+		}
 	}
 	
 	public function onSSSasyncUpdate(SSSasyncUpdateEvent $event){
@@ -74,11 +85,17 @@ class LinkPlayerCountManager implements Listener{
 		$serverOnlineArray = $sss->getServerOnline();
 		$playerOnlineArray = $sss->getPlayerData();
 		$currPlayerCount = count($this->plugin->getServer()->getOnlinePlayers());
+		if($this->combineMaxSlots){
+			$currPlayerMax = $this->plugin->getServer()->getMaxPlayers();
+		}
 		foreach($this->servers as $index => $server){
 			if(isset($serverOnlineArray[$index])){
 				if($serverOnlineArray[$index]){
 					if(isset($playerOnlineArray[$index])){
 						$currPlayerCount += $playerOnlineArray[$index][0];
+						if($this->combineMaxSlots){
+							$currPlayerMax += $playerOnlineArray[$index][1];
+						}
 					}
 					if(!$this->servers[$index][2]){
 						if(in_array("LinkPlayerCount", $sss->getFullData()[$index]["plugins"])){
@@ -91,6 +108,9 @@ class LinkPlayerCountManager implements Listener{
 			}
 		}
 		$this->playerCount = $currPlayerCount;
+		if($this->combineMaxSlots){
+			$this->playerMax = $currPlayerMax;
+		}
 		$this->dataRefreshTick = $lastRefreshTick;
 	}
 }

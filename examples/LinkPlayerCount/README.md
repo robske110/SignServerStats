@@ -4,6 +4,8 @@ A PocketMine plugin depending on SignServerStats which displays the playercount 
 ## Usage:
 The servers can be added in servers.yml manually or can be simply added/removed by anyone with the permission `StatusList.manageList` through the commands `linkplayercount add <ip> [port]` / `linkplayercount rem <ip> [port]`.
 
+If don't want that the max player count is also combined, please set `combine-max-slots` to false in the `config.yml`.
+
 **WARNING: This plugin might create a wrong playercount (steadily increasing) when used in a circular way.**
 This means that when you have a server1 that is combining from server2 and a server2 which combines with server1, the playercount would go steadily up to crazy levels.
 To visualize here are some scenarios:
@@ -11,7 +13,7 @@ To visualize here are some scenarios:
           |-----------LOBBY SERVER (65/175)-------------|
           |                     |                       |
           |                     |                       |
-Spleef Server (10/40) |----SG LOBBY (40/90)---| Premium Server(10/20)
+Spleef Server (10/40) |----SG LOBBY (40/90)----| Premium Server(10/20)
                       |         |              |
                       |         |              |
            SG GAME1 (10/20) SG GAME2 (10/20) SG GAME3 (10/20)
