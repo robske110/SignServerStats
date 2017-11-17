@@ -9,7 +9,7 @@ class LinkPlayerCountManager implements Listener{
 	/** @var LinkPlayerCount */
 	private $plugin;
 	/** @var array */
-	private $servers = []; //[string hostname, int port]
+	private $servers = []; //[string hostname, int port, bool hasWarned]
 	/** @var int */
 	private $playerCount;
 	/** @var int */
@@ -29,7 +29,7 @@ class LinkPlayerCountManager implements Listener{
 	 */
 	public function addServer(string $hostname, int $port): bool{
 		if(!isset($this->servers[$hostname."@".$port])){
-			$this->servers[$hostname."@".$port] = [$hostname, $port, null];
+			$this->servers[$hostname."@".$port] = [$hostname, $port, false];
 			return true;
 		}else{
 			return false;
@@ -79,6 +79,13 @@ class LinkPlayerCountManager implements Listener{
 				if($serverOnlineArray[$index]){
 					if(isset($playerOnlineArray[$index])){
 						$currPlayerCount += $playerOnlineArray[$index][0];
+					}
+					if(!$this->servers[$index][2]){
+						if(in_array("LinkPlayerCount", $sss->getFullData()[$index]["plugins"])){
+							$this->plugin->getLogger()->critical("THE SERVER ".$index." ALSO HAS THIS PLUGIN INSTALLED. PLEASE MAKE SURE THAT THERE IS NO CIRCULAR REFERENCE!");
+							$this->plugin->getLogger()->notice("Having two servers combine the playercounts of each other will result in a steadily rising playercount! For more information please consult the README.");
+							$this->servers[$index][2] = true;
+						}
 					}
 				}
 			}

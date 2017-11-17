@@ -10,7 +10,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat as TF;
 
 class LinkPlayerCount extends PluginBase{
-	const SSS_API_VERSION = "1.0.0";
+	const SSS_API_VERSION = "1.1.0";
 	const API_VERSION = "1.0.0";
 	
 	/** @var Config */
