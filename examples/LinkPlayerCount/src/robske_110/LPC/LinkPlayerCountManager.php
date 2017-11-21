@@ -98,7 +98,10 @@ class LinkPlayerCountManager implements Listener{
 						}
 					}
 					if(!$this->servers[$index][2]){
-						if(in_array("LinkPlayerCount", $sss->getFullData()[$index]["plugins"])){
+						if(!isset($sss->getFullData()[$index]["plugins"])){
+							continue;
+						}
+						if(!empty(preg_grep("/LinkPlayerCount/", explode("; ", $sss->getFullData()[$index]["plugins"])))){
 							$this->plugin->getLogger()->critical("THE SERVER ".$index." ALSO HAS THIS PLUGIN INSTALLED. PLEASE MAKE SURE THAT THERE IS NO CIRCULAR REFERENCE!");
 							$this->plugin->getLogger()->notice("Having two servers combine the playercounts of each other will result in a steadily rising playercount! For more information please consult the README.");
 							$this->servers[$index][2] = true;
