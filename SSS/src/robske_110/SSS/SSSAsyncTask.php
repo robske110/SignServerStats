@@ -134,8 +134,9 @@ class SSSAsyncTask extends AsyncTask{
 	}
   
 	public function onCompletion(Server $server){
-		if($server->getPluginManager()->getPlugin("SignServerStats") instanceof SignServerStats){
-			$server->getPluginManager()->getPlugin("SignServerStats")->asyncTaskCallBack($this->getResult(), $this->startTick);
+	    $sss = $server->getPluginManager()->getPlugin("SignServerStats");
+		if($sss instanceof SignServerStats){
+			$sss->asyncTaskCallBack($this->getResult(), $this->startTick);
 		}else{
 			echo("Warning: Async Task started by SignServerStats could not find SignServerStats; aborting");
 		}

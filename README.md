@@ -1,6 +1,8 @@
 # SignServerStats
 A PocketMine plugin which can display player count and MODT on a sign from any server with query enabled.
 
+[![](https://poggit.pmmp.io/shield.api/SignServerStats)](https://poggit.pmmp.io/p/SignServerStats)
+
 ## Usage:
 Anyone with the permission `SSS.signs` can create a sign with the following content:
 ```
@@ -21,9 +23,9 @@ Example plugins are provided in /examples/:
 - DumpInfo.php - Dumps all available info about a server.
 
 Because the following two examples may also be useful for users, they are also provided as phars in every release:
-- WarnOffline/ - Warns if a server has gone offline. Depends on StatusList.
-- StatusList/ - Lists online status and player count of multiple servers in a List.
-- LinkPlayerCount/ - Links the player count of multiple servers.
+- StatusList/ - Lists online status and player count of multiple servers in a List. [![](https://poggit.pmmp.io/shield.api/StatusList)](https://poggit.pmmp.io/p/StatusList)
+- WarnOffline/ - Warns if a server has gone offline. Depends on StatusList. [![](https://poggit.pmmp.io/shield.api/WarnOffline)](https://poggit.pmmp.io/p/WarnOffline)
+- LinkPlayerCount/ - Links the player count of multiple servers. (InDev)
 
 _You should always check if your plugin is compatible with the version of StatusList present on the current server with the help of the isCompatible function_
 
