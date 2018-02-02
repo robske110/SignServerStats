@@ -36,7 +36,7 @@ class LinkPlayerCount extends PluginBase{
 			$this->getServer()->getPluginManager()->disablePlugin($this);
 			return;
 		}
-		$this->cfg = new Config($this->getDataFolder()."SSSconfig.yml", Config::YAML, []);
+		$this->cfg = new Config($this->getDataFolder()."LPCconfig.yml", Config::YAML, []);
 		if($this->cfg->get("ConfigVersion") != 1){
 			$this->cfg->set('combine-max-slots', true);
 			$this->cfg->set('ConfigVersion', 1);
