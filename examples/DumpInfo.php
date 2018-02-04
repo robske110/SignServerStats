@@ -4,7 +4,7 @@
  * @name DumpServerInfo
  * @main robske_110\DPS\DumpServerInfo
  * @version 1.0.0
- * @api 3.0.0-ALPHA10
+ * @api 3.0.0-ALPHA11
  * @description Dumps query info of a Server using SignServerStats
  * @author robske_110
  * @license MIT
