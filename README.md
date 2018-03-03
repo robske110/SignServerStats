@@ -27,7 +27,7 @@ Because the following two examples may also be useful for users, they are also p
 - WarnOffline/ - Warns if a server has gone offline. Depends on StatusList. [![](https://poggit.pmmp.io/shield.api/WarnOffline)](https://poggit.pmmp.io/p/WarnOffline)
 - LinkPlayerCount/ - Links the player count of multiple servers. (InDev)
 
-_You should always check if your plugin is compatible with the version of StatusList present on the current server with the help of the isCompatible function_
+_You should always check if your plugin is compatible with the version of SignServerStats present on the current server with the help of the isCompatible function_
 
 Example:
 ```php
