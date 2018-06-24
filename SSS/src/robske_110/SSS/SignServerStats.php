@@ -102,7 +102,7 @@ class SignServerStats extends PluginBase{
 		$this->doRefreshSigns = $this->db->getAll();
 		$this->recalcdRSvar();
 		$this->timeout = $this->signServerStatsCfg->get('server-query-timeout-sec');
-		$this->server->getScheduler()->scheduleRepeatingTask(
+		$this->getScheduler()->scheduleRepeatingTask(
 			new SSSAsyncTaskCaller($this), $this->signServerStatsCfg->get("async-task-call-ticks")
 		);
 	}
@@ -303,7 +303,7 @@ class SignServerStats extends PluginBase{
 	 */
 	public function startAsyncTask($currTick){
 		$this->asyncTaskIsRunning = true;
-		$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $this->timeout, $currTick));
+		$this->server->getAsyncPool()->submitTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $this->timeout, $currTick));
 	}
 	
 	/**

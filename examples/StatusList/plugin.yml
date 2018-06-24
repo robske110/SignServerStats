@@ -1,5 +1,5 @@
 name: StatusList
-api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11]
+api: 3.0.0
 version: 1.1.0
 depend: SignServerStats
 load: POSTWORLD
@@ -11,23 +11,26 @@ commands:
   description: Adds a sepecified server to the statuslist
   usage: "/statuslist add <hostname> [port]"
   permission: StatusList.manageList
-  aliases: [addSL, addsl, SLadd, sladd, addSserver, addStatusS, sl add, SL add]
+  aliases: [sl add]
  statuslist rem:
   description: Removes a sepecified server from the statuslist
   usage: "/statuslist rem <hostname> [port]"
   permission: StatusList.manageList
-  aliases: [remSL, remsl, SLrem, slrem, remSserver, remStatusS, sl rem, SL rem, statuslist remove]
+  aliases: [sl rem]
  statuslist show:
    description: Shows all servers on the statuslist
    usage: "/statuslist show <hostname> [port]"
    permission: StatusList.seeList
-   aliases: [showSL, showsl, SLshow, slshow, listStatusList, showStatusList, sl show, SL show, statuslist list]
+   aliases: [sl show]
 
 permissions:
  StatusList:
   description: "Allows to use all StatusList features"
+  default: false
   children:
    StatusList.seeList:
     description: "Users with this permission will be able to see the statuslist."
+    default: op
    StatusList.manageList:
     description: "Users with this permission will be able to add/remove servers from the statuslist."
+    default: op
