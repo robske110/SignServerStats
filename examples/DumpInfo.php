@@ -4,7 +4,7 @@
  * @name DumpServerInfo
  * @main robske_110\DPS\DumpServerInfo
  * @version 1.0.0
- * @api 3.0.0-ALPHA11
+ * @api [3.0.0, 3.0.1, 3.0.2, 3.0.3, 3.0.4, 3.0.5, 3.0.6]
  * @description Dumps query info of a Server using SignServerStats
  * @author robske_110
  * @license MIT
@@ -19,7 +19,7 @@ namespace robske_110\DPS{
 	use pocketmine\command\Command;
 	use pocketmine\command\CommandSender;
 	use pocketmine\utils\TextFormat as TF;
-	use pocketmine\scheduler\PluginTask;
+	use pocketmine\scheduler\Task;
 
 	class DumpServerInfo extends PluginBase{
 		
@@ -53,7 +53,7 @@ namespace robske_110\DPS{
 				return;
 			}
 			$this->displayTask = new DisplayTask($this);
-			$this->getServer()->getScheduler()->scheduleRepeatingTask($this->displayTask, 10);
+			$this->getScheduler()->scheduleRepeatingTask($this->displayTask, 10);
 		}
 		
 		public function getSSS(): ?SignServerStats{
@@ -91,12 +91,11 @@ namespace robske_110\DPS{
 		}
 	}
 	
-	class DisplayTask extends PluginTask{
+	class DisplayTask extends Task{
 		private $plugin;
 		private $checkServers = [];
 	
 	    public function __construct(DumpServerInfo $plugin){
-	        parent::__construct($plugin);
 	        $this->plugin = $plugin;
 	    }
 	

@@ -17,7 +17,7 @@ use pocketmine\Server;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 use pocketmine\block\BlockIds;
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 
 class SSSListener implements Listener{
 	private $main;
@@ -94,8 +94,8 @@ class SSSListener implements Listener{
 						if(!$this->main->getServerOnline()[$address[0]."@".$address[1]]){
 							return;
 						}
-						$this->main->getServer()->getScheduler()->scheduleDelayedTask(
-							new class($this->main, $player, $address[0], $address[1], $id) extends PluginTask{
+						$this->main->getScheduler()->scheduleDelayedTask(
+							new class($this->main, $player, $address[0], $address[1], $id) extends Task{
 								/** @var Player */
 								private $player;
 								/** @var string */
@@ -106,7 +106,6 @@ class SSSListener implements Listener{
 								private $id;
 									
 								public function __construct(SignServerStats $plugin, Player $player, string $ip, int $port, int $id){
-									parent::__construct($plugin);
 									$this->player = $player;
 									$this->ip = $ip;
 									$this->port = $port;

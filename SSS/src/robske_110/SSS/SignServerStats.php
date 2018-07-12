@@ -17,6 +17,9 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\tile\Sign;
 use robske_110\SSS\event\SSSasyncUpdateEvent;
 
+use pocketmine\scheduler\Task;
+use pocketmine\scheduler\TaskScheduler;
+
 /* _____ _____ _____ 
   / ____/ ____/ ____|
  | (___| (___| (___  
@@ -102,7 +105,7 @@ class SignServerStats extends PluginBase{
 		$this->doRefreshSigns = $this->db->getAll();
 		$this->recalcdRSvar();
 		$this->timeout = $this->signServerStatsCfg->get('server-query-timeout-sec');
-		$this->server->getScheduler()->scheduleRepeatingTask(
+		$this->getScheduler()->scheduleRepeatingTask(
 			new SSSAsyncTaskCaller($this), $this->signServerStatsCfg->get("async-task-call-ticks")
 		);
 	}
@@ -303,7 +306,7 @@ class SignServerStats extends PluginBase{
 	 */
 	public function startAsyncTask($currTick){
 		$this->asyncTaskIsRunning = true;
-		$this->server->getScheduler()->scheduleAsyncTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $this->timeout, $currTick));
+		$this->server->getAsyncPool()->submitTask(new SSSAsyncTask($this->doCheckServers, $this->debug, $this->timeout, $currTick));
 	}
 	
 	/**

@@ -15,7 +15,6 @@ class SSSasyncUpdateEvent extends PluginEvent{
 	public static $handlerList = null;
 	
 	public function __construct(SignServerStats $sss, int $lastUpdate, int $currUpdate){
-		parent::__construct($sss);
 		$this->sss = $sss;
 		$this->lastUpdate = $lastUpdate;
 		$this->currUpdate = $currUpdate;
