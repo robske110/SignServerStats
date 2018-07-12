@@ -17,6 +17,9 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\tile\Sign;
 use robske_110\SSS\event\SSSasyncUpdateEvent;
 
+use pocketmine\scheduler\Task;
+use pocketmine\scheduler\TaskScheduler;
+
 /* _____ _____ _____ 
   / ____/ ____/ ____|
  | (___| (___| (___  
