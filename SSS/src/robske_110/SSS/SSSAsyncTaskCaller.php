@@ -9,6 +9,7 @@
 namespace robske_110\SSS;
 
 use pocketmine\scheduler\Task;
+use pocketmine\scheduler\TasksScheduler;
 
 class SSSAsyncTaskCaller extends Task{
 	/** @var SignServerStats */
