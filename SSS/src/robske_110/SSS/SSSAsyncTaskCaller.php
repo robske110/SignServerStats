@@ -8,14 +8,13 @@
 */
 namespace robske_110\SSS;
 
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 
-class SSSAsyncTaskCaller extends PluginTask{
+class SSSAsyncTaskCaller extends Task{
 	/** @var SignServerStats */
 	private $sss;
 	
 	public function __construct(SignServerStats $main){
-		parent::__construct($main);
 		$this->sss = $main;
 	}
 	
