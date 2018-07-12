@@ -20,6 +20,7 @@ commands:
 permissions:
  LinkPlayerCount:
   description: "Allows to use all LinkPlayerCount features"
+  default: false
   children:
    LinkPlayerCount.manageList:
     description: "Users with this permission will be able to add/remove servers."
