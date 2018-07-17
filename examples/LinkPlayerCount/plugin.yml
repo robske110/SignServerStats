@@ -1,5 +1,5 @@
 name: LinkPlayerCount
-api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11]
+api: 3.0.0
 version: 1.0.0
 depend: SignServerStats
 load: POSTWORLD
@@ -11,15 +11,17 @@ commands:
   description: Adds a sepecified server
   usage: "/linkplayercount add <hostname> [port]"
   permission: LinkPlayerCount.manageList
-  aliases: [addLPC, addlpc, lpcadd, LPCadd, lpc add, LPC add]
+  aliases: [lpc add]
  linkplayercount rem:
   description: Removes a sepecified server
   usage: "/linkplayercount rem <hostname> [port]"
   permission: LinkPlayerCount.manageList
-  aliases: [remLPC, remlpc, lpcrem, LPCrem, lpc rem, LPC rem, linkplayercount remove]
+  aliases: [lpc rem]
 permissions:
  LinkPlayerCount:
   description: "Allows to use all LinkPlayerCount features"
+  default: false
   children:
    LinkPlayerCount.manageList:
     description: "Users with this permission will be able to add/remove servers."
+    default: op
