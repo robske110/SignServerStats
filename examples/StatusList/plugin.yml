@@ -11,17 +11,17 @@ commands:
   description: Adds a sepecified server to the statuslist
   usage: "/statuslist add <hostname> [port]"
   permission: StatusList.manageList
-  aliases: [sl add]
+  aliases: [sl add, sladd]
  statuslist rem:
   description: Removes a sepecified server from the statuslist
   usage: "/statuslist rem <hostname> [port]"
   permission: StatusList.manageList
-  aliases: [sl rem]
+  aliases: [sl rem, slrem]
  statuslist show:
    description: Shows all servers on the statuslist
    usage: "/statuslist show <hostname> [port]"
    permission: StatusList.seeList
-   aliases: [sl show]
+   aliases: [sl show, slshow, statuslist list, sl list, sllist]
 
 permissions:
  StatusList:
@@ -30,7 +30,7 @@ permissions:
   children:
    StatusList.seeList:
     description: "Users with this permission will be able to see the statuslist."
-    default: op
+    default: true
    StatusList.manageList:
     description: "Users with this permission will be able to add/remove servers from the statuslist."
     default: op

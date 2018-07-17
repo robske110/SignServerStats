@@ -11,12 +11,12 @@ commands:
   description: Adds a sepecified server
   usage: "/linkplayercount add <hostname> [port]"
   permission: LinkPlayerCount.manageList
-  aliases: [lpc add]
+  aliases: [lpc add, lpcadd]
  linkplayercount rem:
   description: Removes a sepecified server
   usage: "/linkplayercount rem <hostname> [port]"
   permission: LinkPlayerCount.manageList
-  aliases: [lpc rem]
+  aliases: [lpc rem, lpcrem]
 permissions:
  LinkPlayerCount:
   description: "Allows to use all LinkPlayerCount features"
