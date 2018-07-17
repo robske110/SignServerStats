@@ -1,5 +1,5 @@
 # StatusList
-A PocketMine plugin depending on SignServerStats which displays a list of servers in chat/console with their online Status associated with them.
+A PocketMine plugin depending on SignServerStats which displays a list of servers in chat/console with their online status and player stats associated with them.
 
 ## Usage:
 Anyone with the permission `StatusList.seeList` can use the command `statuslist show` to prompt a response which will look like this:
