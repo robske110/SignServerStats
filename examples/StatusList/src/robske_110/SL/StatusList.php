@@ -21,7 +21,6 @@ class StatusList extends PluginBase{
 	private $ownedServers;
 	
 	public function onEnable(){
-		@mkdir($this->getDataFolder());
 		if(($sss = $this->getSSS()) !== null){
 			if(!$sss->isCompatible(self::SSS_API_VERSION)){
 				$newOld = version_compare(self::SSS_API_VERSION, SignServerStats::API_VERSION, ">") ? "old" : "new";

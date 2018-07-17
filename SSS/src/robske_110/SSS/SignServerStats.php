@@ -81,7 +81,6 @@ class SignServerStats extends PluginBase{
 	];
 	
 	public function onEnable(){
-		@mkdir($this->getDataFolder());
 		$this->server = $this->getServer();
 		$this->db = new Config($this->getDataFolder()."SignServerStatsDB.yml", Config::YAML, []); //TODO:betterDB
 		$this->signServerStatsCfg = new Config($this->getDataFolder()."SSSconfig.yml", Config::YAML, []);
