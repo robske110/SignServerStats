@@ -24,7 +24,7 @@ before_script:
  - echo | pecl install channel://pecl.php.net/yaml-2.0.2
  - git clone --recursive https://github.com/pmmp/PocketMine-MP.git --depth=1
  - cd PocketMine-MP
- - git checkout 3.1.0
+ - git checkout tags/3.1.0
  - composer install
  - mkdir plugins
  - cd plugins
