@@ -1,6 +1,6 @@
 name: SignServerStats
 api: 3.0.0
-version: 1.1.0
+version: 1.1.1
 load: POSTWORLD
 main: robske_110\SSS\SignServerStats
 author: robske_110
