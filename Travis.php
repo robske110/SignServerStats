@@ -46,7 +46,7 @@ foreach($plugins as $pluginName => $info){
 	if(!$info[1]){
 		continue;
 	}
-	if(count(glob("plugins/DevTools/".$pluginName."*.phar")) === 0){
+	if(count(glob("plugin_data/DevTools/".$pluginName."*.phar")) === 0){
 		echo("Failed to create ".$pluginName." phar!\n");
 		$exit = 1;
 	}else{
