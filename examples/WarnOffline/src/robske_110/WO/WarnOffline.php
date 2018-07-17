@@ -15,6 +15,7 @@ class WarnOffline extends PluginBase{
 	private $warnNotifier;
 	
 	public function onEnable(){
+		@mkdir($this->getDataFolder());
 		if(($sl = $this->getSL()) !== null){
 			if(!$sl->isCompatible(self::SL_API_VERSION)){
 				$newOld = version_compare(self::SL_API_VERSION, StatusList::API_VERSION, ">") ? "old" : "new";
