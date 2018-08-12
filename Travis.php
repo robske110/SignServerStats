@@ -5,15 +5,15 @@ $plugins = ["SignServerStats" => ["SSS/", true], "StatusList" => ["examples/Stat
 foreach($plugins as $info){
 	$info[0] = $repoPath.$info[0];
 	if($info[1]){
-		echo("exec: "."cp -rf ".$info[0]." ./plugins/");
+		echo("exec: "."cp -rf ".$info[0]." ./plugins/\n");
 		exec("cp -rf ".$info[0]." ./plugins/");
 	}else{
 		echo("exec: "."cp -f ".$info[0]." ./plugins/");
-		exec("cp -f ".$info[0]." ./plugins/");
+		exec("cp -f ".$info[0]." ./plugins/\n");
 	}
 }
 
-$server = proc_open(PHP_BINARY . " src/pocketmine/PocketMine.php --no-wizard --disable-readline", [
+$server = proc_open(PHP_BINARY . " src/pocketmine/PocketMine.php --no-wizard --disable-readline --settings.enable-dev-builds=true", [
 	0 => ["pipe", "r"],
 	1 => ["pipe", "w"],
 	2 => ["pipe", "w"]
