@@ -25,7 +25,7 @@ Example plugins are provided in /examples/:
 Because the following two examples may also be useful for users, they are also provided as phars in every release:
 - StatusList/ - Lists online status and player count of multiple servers in a List. [![](https://poggit.pmmp.io/shield.api/StatusList)](https://poggit.pmmp.io/p/StatusList)
 - WarnOffline/ - Warns if a server has gone offline. Depends on StatusList. [![](https://poggit.pmmp.io/shield.api/WarnOffline)](https://poggit.pmmp.io/p/WarnOffline)
-- LinkPlayerCount/ - Links the player count of multiple servers. (InDev)
+- LinkPlayerCount/ - Links the player count of multiple servers. [![](https://poggit.pmmp.io/shield.api/LinkPlayerCount)](https://poggit.pmmp.io/p/LinkPlayerCount)
 
 _You should always check if your plugin is compatible with the version of SignServerStats present on the current server with the help of the isCompatible function_
 
