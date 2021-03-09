@@ -70,7 +70,7 @@ class SSSListener implements Listener{
 			return true;
 		}
 		$sign = $event->getLines();
-		if($sign[0]=='[SSS]'){
+		if($sign{0}=='[SSS]'){
 			if(!$this->main->isAdmin($player)){
 				$this->sendSSSmessage($player, TF::RED."You are not allowed to do that!");
 				$event->setLine(0,"[BLOCKED]");
@@ -90,12 +90,12 @@ class SSSListener implements Listener{
 				$id = null;
 				if($this->main->doesSignExist($block, $levelName, $id)){
 					if($player->hasPermission("SSS.servertransfer")){
-						$address = $this->main->getSignList()[$id][1];
+						$address = $this->main->getSignList(){$id}{1};
 						if(!$this->main->getServerOnline()[$address[0]."@".$address[1]]){
 							return;
 						}
 						$this->main->getScheduler()->scheduleDelayedTask(
-							new class($this->main, $player, $address[0], $address[1], $id) extends Task {
+							new class($this->main, $player, $address{0}, $address{1}, $id) extends Task {
 								/** @var Player */
 								private $player;
 								/** @var string */
@@ -122,26 +122,26 @@ class SSSListener implements Listener{
 					return;
 				}
 				$sign = $signTile->getText();
-				if($sign[0] == '[SSS]'){
+				if($sign{0} == '[SSS]'){
 					$address = null;
 					$port = null;
 					if($this->main->isAdmin($player)){
-						if(!empty($sign[1])){
-							if(!empty($sign[2])){
-								if($sign[1]{strlen($sign[1]) - 1} == "-"){
-									if(!empty($sign[3])){
-										if(is_numeric($sign[3])){
-											$address = substr($sign[1], 0, strlen($sign[1]) - 1).$sign[2];
-											$port = $sign[3];
+						if(!empty($sign{1})){
+							if(!empty($sign{2})){
+								if($sign{1}{strlen($sign{1}) - 1} == "-"){
+									if(!empty($sign{3})){
+										if(is_numeric($sign{3})){
+											$address = substr($sign{1}, 0, strlen($sign{1}) - 1).$sign{2};
+											$port = $sign{3};
 										}else{
 											$this->sendSSSmessage($player, TF::RED."Port must be a number! (Line 4)");
 										}
 									}else{
 										$this->sendSSSmessage($player, TF::RED."Port is missing! (Line 4)");
 									}
-								}elseif(is_numeric($sign[2])){
-									$address = $sign[1];
-									$port = $sign[2];
+								}elseif(is_numeric($sign{2})){
+									$address = $sign{1};
+									$port = $sign{2};
 								}else{
 									$this->sendSSSmessage($player, TF::RED."Port must be a number! (Line 3)");
 								}
